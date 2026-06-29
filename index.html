@@ -1693,6 +1693,43 @@
             50%       { opacity: 1; }
         }
 
+        /* Interaction hint chips */
+        .icon-hint {
+            position: absolute;
+            bottom: -46px;
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            pointer-events: none;
+            opacity: 0;
+            animation: hintReveal 6.5s var(--ease-quiet) forwards;
+            animation-delay: 1.4s;
+        }
+
+        .icon-hint .hint-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
+            color: rgba(0, 212, 255, 0.7);
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.16);
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        @keyframes hintReveal {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(6px); }
+            10%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+            72%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
         @media (max-width: 900px) {
             .hero-icon-float {
                 display: none;
@@ -1737,7 +1774,7 @@
         <canvas class="hero-bg" id="bg-canvas"></canvas>
 
         <!-- Floating draggable KiHub icon -->
-        <div class="hero-icon-float" id="hero-icon-float" title="Drag me">
+        <div class="hero-icon-float" id="hero-icon-float">
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <!-- Ripple rings on outer nodes -->
                 <circle class="node-ripple" cx="50" cy="10" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:0s"/>
@@ -1762,6 +1799,16 @@
                 <circle cx="87" cy="77" r="6"  fill="var(--neon-cyan)" opacity="0.4"/>
                 <circle cx="87" cy="77" r="3.5" fill="var(--neon-cyan)"/>
             </svg>
+            <div class="icon-hint" id="icon-hint" aria-hidden="true">
+                <span class="hint-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                    Drag
+                </span>
+                <span class="hint-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M2 11.5a10 10 0 0 1 18.8-4.3"/><path d="M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                    Swipe nodes to spin
+                </span>
+            </div>
         </div>
 
         <div class="hero-content">
@@ -2667,6 +2714,16 @@ Save a Copy as XML [
         if (floatIcon && !prefersReduced) {
             let dragX = 0, dragY = 0, startX = 0, startY = 0, isDragging = false;
 
+            // Dismiss interaction hint
+            const iconHint = document.getElementById('icon-hint');
+            let hintDismissed = false;
+            function dismissHint() {
+                if (hintDismissed || !iconHint) return;
+                hintDismissed = true;
+                iconHint.style.transition = 'opacity 0.4s';
+                iconHint.style.opacity = '0';
+            }
+
             // Physics
             let angVel = 0;
             let totalRot = 0;
@@ -2723,6 +2780,7 @@ Save a Copy as XML [
 
             // Drag
             floatIcon.addEventListener('pointerdown', e => {
+                dismissHint();
                 isDragging = true;
                 startX = e.clientX - dragX;
                 startY = e.clientY - dragY;
@@ -2749,10 +2807,13 @@ Save a Copy as XML [
                 const dt  = now - prevMT;
 
                 if (dt > 0 && dt < 80 && !isDragging) {
+                    const onNode = nearANode(e.clientX, e.clientY);
                     // Cursor hint
-                    floatIcon.style.cursor = nearANode(e.clientX, e.clientY) ? 'crosshair' : 'grab';
+                    floatIcon.style.cursor = onNode ? 'crosshair' : 'grab';
 
-                    if (nearANode(e.clientX, e.clientY)) {
+                    if (onNode) { dismissHint(); }
+
+                    if (onNode) {
                         const vx = (e.clientX - prevMX) / dt;
                         const vy = (e.clientY - prevMY) / dt;
                         const speed = Math.sqrt(vx * vx + vy * vy);
