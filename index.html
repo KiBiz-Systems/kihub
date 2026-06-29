@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiHub — Open Source Developer Community by KiBiz Systems</title>
+    <meta name="description"
+        content="KiHub is the open-source community by KiBiz Systems. Featuring KiBuild MCP: a FileMaker-aware MCP server for AI coding tools.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;800;900&display=swap">
+    <style>
+        :root {
+            --void-black: #050508;
+            --void-dark: #0A0A0F;
+            --neon-cyan: #00D4FF;
+            --neon-blue: #4D9FFF;
+            --neon-soft: #9DC4FF;
+            --ink-soft: rgba(255, 255, 255, 0.7);
+            --ink-mute: rgba(255, 255, 255, 0.5);
+            --ink-faint: rgba(255, 255, 255, 0.3);
+            --hairline: rgba(255, 255, 255, 0.08);
+            --hairline-strong: rgba(255, 255, 255, 0.15);
+            --ease-quiet: cubic-bezier(.22, 1, .36, 1);
+            --ease-precise: cubic-bezier(.4, 0, .2, 1);
+            --ease-emphasis: cubic-bezier(.16, 1, .3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: var(--void-black);
+        }
+
+        body {
+            background: var(--void-black);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        a,
+        button {
+            cursor: none;
+            color: inherit;
+            text-decoration: none;
+            background: none;
+            border: none;
+            font: inherit;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        ::selection {
+            background: var(--neon-cyan);
+            color: var(--void-black);
+        }
+
+        /* Custom cursor */
+        .cursor-dot,
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            opacity: 0;
+            transition: opacity .25s ease-out;
+            will-change: transform;
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .cursor-ring {
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            transition: opacity .25s ease-out, width .35s var(--ease-quiet), height .35s var(--ease-quiet);
+        }
+
+        .cursor-dot.is-visible,
+        .cursor-ring.is-visible {
+            opacity: 1;
+        }
+
+        @media (pointer: coarse) {
+
+            body,
+            a,
+            button {
+                cursor: auto;
+            }
+
+            .cursor-dot,
+            .cursor-ring {
+                display: none;
+            }
+        }
+
+        /* Typography helpers */
+        .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            font-weight: 400;
+        }
+
+        .label-mute {
+            color: var(--ink-mute);
+        }
+
+        /* Top navigation */
+        nav.top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.4rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            background: rgba(5, 5, 8, 0.55);
+            border-bottom: 1px solid var(--hairline);
+            transition: padding 400ms var(--ease-quiet);
+        }
+
+        nav.top .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        nav.top .logo::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        nav.top ul {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        nav.top ul a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            transition: color 400ms var(--ease-quiet);
+        }
+
+        nav.top ul a:hover {
+            color: var(--neon-cyan);
+        }
+
+        nav.top .cta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 0.65rem 1.25rem;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            transition: all 400ms var(--ease-quiet);
+        }
+
+        nav.top .cta:hover {
+            background: var(--neon-cyan);
+            color: var(--void-black);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-end;
+            padding: 8rem 2rem 4rem;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 100%, transparent, var(--void-black) 90%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .hero-meta .label-row {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: clamp(3rem, 11vw, 11rem);
+            line-height: 0.92;
+            letter-spacing: -0.045em;
+            margin-bottom: 2.5rem;
+            word-break: break-word;
+        }
+
+        .hero-title.is-decoding {
+            text-shadow: 0 0 14px rgba(0, 212, 255, 0.55), 0 0 40px rgba(0, 212, 255, 0.25);
+        }
+
+        .hero-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: clamp(0.95rem, 1.25vw, 1.2rem);
+            line-height: 1.5;
+            color: var(--ink-soft);
+            max-width: 720px;
+            margin-bottom: 3rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 1.15rem 2.4rem;
+            border: 1px solid var(--neon-cyan);
+            background: var(--neon-cyan);
+            color: var(--void-black);
+            transition: all 400ms var(--ease-quiet);
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--neon-cyan);
+        }
+
+        .btn-ghost {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 1.15rem 2.4rem;
+            border: 1px solid var(--hairline-strong);
+            color: var(--ink-soft);
+            transition: all 400ms var(--ease-quiet);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-ghost:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .hero-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid var(--hairline);
+            padding-top: 2rem;
+            gap: 2rem;
+        }
+
+        .scroll-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+        }
+
+        .scroll-indicator .line {
+            width: 56px;
+            height: 1px;
+            background: var(--hairline-strong);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-indicator .line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-cyan);
+            transform: translateX(-100%);
+            animation: scrollLine 2.6s var(--ease-quiet) infinite;
+        }
+
+        @keyframes scrollLine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            50% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .hero-bottom .stats-mini {
+            display: flex;
+            gap: 3.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+        }
+
+        .hero-bottom .stats-mini strong {
+            display: block;
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.35rem;
+            text-transform: none;
+        }
+
+        .hero-bottom .stats-mini strong .accent {
+            color: var(--neon-cyan);
+        }
+
+        /* Manifesto */
+        .manifesto {
+            padding: 12rem 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .manifesto-inner {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .manifesto-label {
+            margin-bottom: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .manifesto-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--hairline);
+        }
+
+        .manifesto-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.3rem, 2.5vw, 2.2rem);
+            line-height: 1.35;
+            letter-spacing: -0.02em;
+        }
+
+        .manifesto-text .word {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(12px) brightness(30%);
+            will-change: filter, opacity;
+        }
+
+        .manifesto-footer {
+            margin-top: 5rem;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 2rem;
+            border-top: 1px solid var(--hairline);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+        }
+
+        /* Featured Tool Section (KiBuild MCP) */
+        .featured {
+            padding: 8rem 2rem 12rem;
+            border-top: 1px solid var(--hairline);
+        }
+
+        .featured-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-head {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 4rem;
+            margin-bottom: 5rem;
+            align-items: end;
+        }
+
+        .section-head .num-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-head h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 4.8vw, 4rem);
+            letter-spacing: -0.035em;
+            line-height: 1;
+        }
+
+        .section-head h2 .italic {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--neon-soft);
+        }
+
+        .section-head p {
+            font-size: 1.05rem;
+            color: var(--ink-soft);
+            max-width: 540px;
+            line-height: 1.55;
+        }
+
+        .featured-tool {
+            border: 1px solid var(--hairline-strong);
+            background: var(--void-dark);
+            padding: 0;
+            margin-bottom: 6rem;
+        }
+
+        .featured-tool-header {
+            padding: 3rem;
+            border-bottom: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+
+        .featured-tool-header h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .featured-tool-header p {
+            color: var(--ink-soft);
+            font-size: 1rem;
+            max-width: 600px;
+            line-height: 1.55;
+        }
+
+        .featured-tool-header .badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .compare-col {
+            padding: 2.5rem 3rem;
+        }
+
+        .compare-col:first-child {
+            border-right: 1px solid var(--hairline);
+        }
+
+        .compare-col h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            color: var(--ink-mute);
+        }
+
+        .compare-col:first-child h4 {
+            color: var(--ink-faint);
+        }
+
+        .compare-col:last-child h4 {
+            color: var(--neon-cyan);
+        }
+
+        .compare-col ul {
+            list-style: none;
+        }
+
+        .compare-col li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--hairline);
+            font-size: 0.95rem;
+            color: var(--ink-soft);
+            line-height: 1.5;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .compare-col li:last-child {
+            border-bottom: none;
+        }
+
+        .compare-col li .icon {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .compare-col:first-child li .icon {
+            color: var(--ink-faint);
+        }
+
+        .compare-col:last-child li .icon {
+            color: var(--neon-cyan);
+        }
+
+        .compare-col li strong {
+            color: #fff;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.1rem 0.4rem;
+            margin-right: 0.3rem;
+        }
+
+        /* Modules horizontal pin */
+        .modules-viewport {
+            position: relative;
+        }
+
+        .modules-pin {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding-top: 10rem;
+            position: relative;
+            background: var(--void-black);
+            width: 100%;
+        }
+
+        .modules-header {
+            position: absolute;
+            top: 5.5rem;
+            left: 2rem;
+            right: 2rem;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .modules-header h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.6rem, 3.5vw, 3rem);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-top: 1rem;
+        }
+
+        .modules-header .right-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+            text-align: right;
+        }
+
+        .modules-track {
+            display: flex;
+            gap: 2.5rem;
+            padding: 0 4rem;
+            will-change: transform;
+        }
+
+        .module-card {
+            flex: 0 0 380px;
+            height: 480px;
+            background: var(--void-dark);
+            border: 1px solid var(--hairline);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: border-color 600ms var(--ease-quiet), transform 200ms var(--ease-quiet);
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .module-card:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            transform: translateX(-100%);
+            transition: transform 900ms var(--ease-quiet);
+        }
+
+        .module-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .module-card .num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--neon-cyan);
+            letter-spacing: 0.22em;
+            margin-bottom: 0.85rem;
+        }
+
+        .module-card .visual {
+            height: 180px;
+            margin: 0 -1.5rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--hairline);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .module-card .visual pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--neon-soft);
+            text-align: center;
+            padding: 1.5rem;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            line-height: 1.6;
+            white-space: pre;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.05), transparent);
+        }
+
+        .module-card .visual .corner-tag {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            padding: 0.3rem 0.6rem;
+            background: rgba(5, 5, 8, 0.7);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            z-index: 2;
+        }
+
+        .module-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.85rem;
+        }
+
+        .module-card .desc {
+            color: var(--ink-mute);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .module-card .metric {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--ink-mute);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding-top: 1rem;
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-card .metric strong {
+            color: var(--neon-cyan);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .modules-progress {
+            position: absolute;
+            bottom: 3.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12rem;
+            height: 1px;
+            background: var(--hairline);
+            z-index: 5;
+        }
+
+        .modules-progress::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: var(--p, 0%);
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .modules-progress-label {
+            position: absolute;
+            bottom: 4.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        /* Capabilities (Tool Categories) */
+        .capabilities {
+            padding: 12rem 2rem;
+            border-top: 1px solid var(--hairline);
+        }
+
+        .capabilities-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .cap-row {
+            display: grid;
+            grid-template-columns: 70px 1.2fr 2fr 1fr;
+            gap: 3rem;
+            padding: 2.5rem 0 2.5rem 2rem;
+            border-top: 1px solid var(--hairline);
+            position: relative;
+            align-items: start;
+            transition: padding-left 600ms var(--ease-quiet);
+        }
+
+        .cap-row:last-child {
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .cap-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 0;
+            background: var(--neon-cyan);
+            transition: height 600ms var(--ease-quiet);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .cap-row:hover {
+            padding-left: 2.75rem;
+        }
+
+        .cap-row:hover::before {
+            height: 100%;
+        }
+
+        .cap-row .num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
+            padding-top: 0.5rem;
+        }
+
+        .cap-row h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.65rem;
+            letter-spacing: -0.02em;
+            transition: color 600ms var(--ease-quiet);
+        }
+
+        .cap-row:hover h3 {
+            color: var(--neon-cyan);
+        }
+
+        .cap-row p {
+            color: var(--ink-mute);
+            font-size: 0.95rem;
+            line-height: 1.65;
+            transition: color 600ms var(--ease-quiet);
+        }
+
+        .cap-row:hover p {
+            color: var(--ink-soft);
+        }
+
+        .cap-row .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: flex-end;
+            padding-top: 0.35rem;
+        }
+
+        .cap-row .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.6rem;
+            border: 1px solid var(--hairline);
+            color: var(--ink-mute);
+            transition: all 600ms var(--ease-quiet);
+            white-space: nowrap;
+        }
+
+        .cap-row:hover .tag {
+            border-color: rgba(0, 212, 255, 0.35);
+            color: var(--neon-soft);
+        }
+
+        /* Install in Seconds Section */
+        .install {
+            padding: 12rem 2rem;
+            border-top: 1px solid var(--hairline);
+            background: var(--void-black);
+            position: relative;
+        }
+
+        .install-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .install-head {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+            align-items: end;
+        }
+
+        .install-head .left h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.4rem, 6vw, 5.5rem);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-top: 1.5rem;
+        }
+
+        .install-head .left h2 .italic {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--neon-cyan);
+        }
+
+        .install-head .right p {
+            font-size: 1.1rem;
+            color: var(--ink-soft);
+            max-width: 540px;
+            line-height: 1.55;
+        }
+
+        .install-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            border-top: 1px solid var(--hairline-strong);
+            border-bottom: 1px solid var(--hairline-strong);
+        }
+
+        .install-step {
+            padding: 3rem 2rem;
+            border-right: 1px solid var(--hairline);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: background 600ms var(--ease-quiet);
+        }
+
+        .install-step:last-child {
+            border-right: none;
+        }
+
+        .install-step:hover {
+            background: rgba(0, 212, 255, 0.02);
+        }
+
+        .install-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--neon-cyan);
+            transition: width 800ms var(--ease-quiet);
+        }
+
+        .install-step:hover::before {
+            width: 100%;
+        }
+
+        .install-step .step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            margin-bottom: 1.5rem;
+        }
+
+        .install-step h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .install-step p {
+            color: var(--ink-mute);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            min-height: 70px;
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--hairline-strong);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 400ms var(--ease-quiet);
+        }
+
+        .install-step:hover .terminal {
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+
+        .terminal-tab {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--hairline);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-mute);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-tab::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+        }
+
+        .terminal pre {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--neon-soft);
+            overflow-x: auto;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .terminal pre .cmd {
+            color: #fff;
+        }
+
+        .terminal pre .comment {
+            color: var(--ink-faint);
+        }
+
+        .terminal pre .str {
+            color: var(--neon-cyan);
+        }
+
+        .terminal pre .out {
+            color: var(--ink-mute);
+        }
+
+        .install-step .note {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-top: auto;
+        }
+
+        /* CTA */
+        .cta {
+            padding: 12rem 2rem;
+            border-top: 1px solid var(--hairline);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08), transparent 65%);
+            pointer-events: none;
+        }
+
+        .cta-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .cta .label {
+            margin-bottom: 3rem;
+            display: block;
+        }
+
+        .cta h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.4rem, 7vw, 6rem);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 2rem;
+        }
+
+        .cta h2 .italic {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--neon-cyan);
+        }
+
+        .cta p {
+            color: var(--ink-soft);
+            font-size: 1.1rem;
+            max-width: 560px;
+            margin: 0 auto 4rem;
+            line-height: 1.55;
+        }
+
+        .cta-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 1.15rem 2.4rem;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            transition: all 400ms var(--ease-quiet);
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--neon-cyan);
+            transform: translateY(101%);
+            transition: transform 500ms var(--ease-quiet);
+            z-index: -1;
+        }
+
+        .cta-btn:hover {
+            color: var(--void-black);
+        }
+
+        .cta-btn:hover::before {
+            transform: translateY(0);
+        }
+
+        .cta-btn.ghost {
+            border-color: var(--hairline-strong);
+            color: var(--ink-soft);
+        }
+
+        .cta-btn.ghost::before {
+            background: #fff;
+        }
+
+        .cta-btn.ghost:hover {
+            color: var(--void-black);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--hairline);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .footer-brand .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-brand .logo::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        .footer-brand p {
+            color: var(--ink-mute);
+            font-size: 0.9rem;
+            line-height: 1.65;
+            max-width: 380px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-brand .signals {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-col h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-col a {
+            color: var(--ink-soft);
+            font-size: 0.88rem;
+            transition: color 300ms var(--ease-quiet);
+        }
+
+        .footer-col a:hover {
+            color: var(--neon-cyan);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--ink-faint);
+            letter-spacing: 0.12em;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-bottom .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-bottom .status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-cyan);
+            animation: pulseDot 2.4s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.1s var(--ease-quiet), transform 1.1s var(--ease-quiet);
+        }
+
+        .reveal.is-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            nav.top ul {
+                display: none;
+            }
+
+            .hero {
+                padding: 7rem 1.5rem 3rem;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: flex-start;
+            }
+
+            .hero-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2rem;
+            }
+
+            .hero-bottom .stats-mini {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+
+            .manifesto,
+            .featured,
+            .capabilities,
+            .install,
+            .cta {
+                padding: 6rem 1.5rem;
+            }
+
+            .section-head,
+            .install-head {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .featured-tool-header {
+                flex-direction: column;
+                padding: 2rem;
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-col:first-child {
+                border-right: none;
+                border-bottom: 1px solid var(--hairline);
+            }
+
+            .cap-row {
+                grid-template-columns: 50px 1fr;
+                gap: 1.5rem;
+                padding-left: 1.5rem;
+            }
+
+            .cap-row p,
+            .cap-row .tags {
+                grid-column: 1 / -1;
+            }
+
+            .cap-row .tags {
+                justify-content: flex-start;
+                padding-top: 0.5rem;
+            }
+
+            .cap-row:hover {
+                padding-left: 1.75rem;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem;
+            }
+
+            .modules-pin {
+                position: relative;
+                height: auto;
+                padding: 6rem 0;
+                overflow: visible;
+            }
+
+            .modules-header {
+                position: relative;
+                top: 0;
+                left: 0;
+                right: 0;
+                padding: 0 1.5rem;
+                margin-bottom: 3rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .modules-track {
+                overflow-x: auto;
+                padding: 0 1.5rem;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+            }
+
+            .modules-track::-webkit-scrollbar {
+                display: none;
+            }
+
+            .module-card {
+                flex: 0 0 280px;
+                height: 500px;
+                scroll-snap-align: start;
+            }
+
+            .modules-progress,
+            .modules-progress-label {
+                display: none;
+            }
+
+            .install-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .install-step {
+                border-right: none;
+                border-bottom: 1px solid var(--hairline);
+            }
+
+            .install-step:last-child {
+                border-bottom: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cta-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* One Phrase Install Terminal */
+        .one-phrase-install {
+            margin: 4.5rem auto 5.5rem;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .command-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--hairline-strong);
+            border-radius: 8px;
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 400ms var(--ease-quiet);
+        }
+
+        .command-box:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.15);
+        }
+
+        .cmd-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            text-align: left;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(12px, 1.2vw, 15px);
+        }
+
+        .cmd-symbol {
+            color: var(--neon-cyan);
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .typing-text {
+            color: var(--neon-soft);
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .cursor-pipe {
+            color: var(--neon-cyan);
+            animation: blinkCursor 0.8s step-end infinite;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        @keyframes blinkCursor {
+            from, to { color: transparent }
+            50% { color: var(--neon-cyan); }
+        }
+
+        .copy-code-btn {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            transition: all 300ms var(--ease-quiet);
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .copy-code-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--void-black);
+            border-color: var(--neon-cyan);
+        }
+
+        /* Use Cases Section */
+        .use-cases-grid {
+            margin-top: 6rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            border-top: 1px solid var(--hairline);
+            padding-top: 4rem;
+        }
+
+        .use-case-card {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 2.5rem 2rem;
+            background: var(--void-dark);
+            border: 1px solid var(--hairline);
+            transition: all 400ms var(--ease-quiet);
+        }
+
+        .use-case-card:hover {
+            border-color: rgba(0, 212, 255, 0.45);
+            background: rgba(0, 212, 255, 0.01);
+            transform: translateY(-4px);
+        }
+
+        .use-case-card h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+            color: #fff;
+        }
+
+        .use-case-card p {
+            color: var(--ink-mute);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1023px) {
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin-top: 4rem;
+                padding-top: 3rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .scroll-indicator .line::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Custom cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- Top navigation -->
+    <nav class="top">
+        <div class="logo">KiHub / Open-Source</div>
+        <ul>
+            <li><a href="#featured">KiBuild MCP</a></li>
+            <li><a href="#pipeline">How It Works</a></li>
+            <li><a href="#capabilities">Reference</a></li>
+            <li><a href="#install">Get Started</a></li>
+            <li><a href="#whats-next">KiBuild Plugin</a></li>
+            <li><a href="#community">Community</a></li>
+        </ul>
+        <a href="https://github.com/KiBiz-Systems/kibuild-mcp" class="cta">View on GitHub</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <canvas class="hero-bg" id="bg-canvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-meta">
+                <div class="label-row">
+                    <span class="label">KiHub / Community</span>
+                    <span class="label label-mute">KiBuild MCP — First Project · v0.2.0</span>
+                </div>
+                <span class="label label-mute">Open Source platform by KiBiz Systems</span>
+            </div>
+            <h1 class="hero-title" id="hero-title">KiHub</h1>
+            <p class="hero-subtitle"><strong>KiHub is the open-source developer platform by KiBiz Systems.</strong> A community-driven ecosystem for FileMaker and AI developers. <strong>KiBuild MCP</strong> is our first project — a FileMaker-aware MCP server that gives AI coding tools deep, structured schema access without a runtime license.</p>
+            <div class="hero-actions">
+                <a href="#install" class="btn-primary">Install KiBuild MCP →</a>
+                <a href="https://github.com/KiBiz-Systems/kibuild-mcp" class="btn-ghost">▶ View Source</a>
+            </div>
+            <div class="hero-bottom">
+                <div class="scroll-indicator">
+                    <span>Scroll to explore</span>
+                    <div class="line"></div>
+                </div>
+                <div class="stats-mini">
+                    <div><strong>32<span class="accent">.</span></strong>MCP tools</div>
+                    <div><strong>0<span class="accent">.</span></strong>Runtime licenses</div>
+                    <div><strong>6<span class="accent">+</span></strong>AI tools supported</div>
+                    <div><strong>1<span class="accent">.</span></strong>Unified schema map</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manifesto -->
+    <section class="manifesto">
+        <div class="manifesto-inner">
+            <div class="manifesto-label">
+                <span class="label">/01 — The KiHub mandate</span>
+            </div>
+            <p class="manifesto-text" id="manifesto-text">KiBiz Systems built KiHub because developer infrastructure for FileMaker and AI should be open, free, and built in the open. When an AI tries to grep raw XML to understand a FileMaker database, it is flying blind. KiBuild MCP is our first answer — and it is only the beginning.</p>
+            <div class="manifesto-footer">
+                <span>Creator: KiBiz Systems · Open-source platform</span>
+                <span>License: MIT</span>
+            </div>
+
+            <div class="use-cases-grid reveal">
+                <div class="use-case-card">
+                    <span class="label" style="color: var(--neon-soft); font-size: 10px; margin-bottom: 1rem; display: block;">01 / Developers</span>
+                    <h4>AI-Driven Navigation</h4>
+                    <p>Let your AI assistant instantly navigate, locate, and read scripts, layouts, and tables by name without digging through directories.</p>
+                </div>
+                <div class="use-case-card">
+                    <span class="label" style="color: var(--neon-soft); font-size: 10px; margin-bottom: 1rem; display: block;">02 / Teams</span>
+                    <h4>AI-Assisted Reviews</h4>
+                    <p>Perform comprehensive impact analysis. Trace field usage across calculations, layouts, and relationships before making changes.</p>
+                </div>
+                <div class="use-case-card">
+                    <span class="label" style="color: var(--neon-soft); font-size: 10px; margin-bottom: 1rem; display: block;">03 / Architects</span>
+                    <h4>Zero Runtime Cost</h4>
+                    <p>Run your AI agents directly against exported XML schema files. No FileMaker runtime license required to power your assistant.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Tool (KiBuild MCP) -->
+    <section class="featured" id="featured">
+        <div class="featured-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/02 — Flagship Project</div>
+                    <h2>KiBuild MCP.<br><span class="italic">Structured access.</span></h2>
+                </div>
+                <p>A FileMaker-aware MCP server that gives AI coding tools deep, structured access to your FileMaker
+                    schema — scripts, layouts, tables, relationships, and dependencies.</p>
+            </div>
+
+            <div class="featured-tool reveal">
+                <div class="featured-tool-header">
+                    <div>
+                        <h3>KiBuild MCP</h3>
+                        <p>Works with Claude Code, Cursor, Windsurf, Codex, Antigravity (Google), and any MCP-compatible
+                            AI tool.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge">v0.2.0</span>
+                        <span class="badge" style="border-color: var(--hairline-strong); color: var(--ink-soft);">MIT License</span>
+                        <span class="badge" style="border-color: var(--hairline-strong); color: var(--ink-soft);">Go 1.21+</span>
+                    </div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="compare-col">
+                        <h4>Without KiBuild (Grep / Raw XML)</h4>
+                        <ul>
+                            <li><span class="icon">✕</span><span>Find where a script is called: <strong>grep -r "Send
+                                        Email"</strong> across hundreds of XML files — noisy, slow, misses numeric
+                                    IDs.</span></li>
+                            <li><span class="icon">✕</span><span>Find where a field is used: Manual regex over
+                                    calculation XML — misses layouts and relationships entirely.</span></li>
+                            <li><span class="icon">✕</span><span>Understand a script: Read hundreds of lines of raw XML
+                                    step-by-step.</span></li>
+                            <li><span class="icon">✕</span><span>Trace a relationship: Open the relationship graph XML
+                                    and parse join predicates manually.</span></li>
+                            <li><span class="icon">✕</span><span>Search the whole schema: Grep tokenizes everything —
+                                    expensive, context-filling, slow.</span></li>
+                        </ul>
+                    </div>
+                    <div class="compare-col">
+                        <h4>With KiBuild MCP</h4>
+                        <ul>
+                            <li><span class="icon">→</span><span><strong>find_script_references_in_scripts</strong>
+                                    returns exact call sites with file paths and line numbers.</span></li>
+                            <li><span class="icon">→</span><span><strong>find_field_references</strong> in calculations,
+                                    layouts, and relationships in one call.</span></li>
+                            <li><span class="icon">→</span><span><strong>find_script</strong> returns a clean step list
+                                    with names resolved.</span></li>
+                            <li><span class="icon">→</span><span><strong>inspect_relationships</strong> returns
+                                    structured JSON immediately.</span></li>
+                            <li><span class="icon">→</span><span><strong>search_index</strong> searches workspace_map.md
+                                    — token-efficient, instant.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Horizontal Pin -->
+    <section class="modules-viewport" id="pipeline">
+        <div class="modules-pin">
+            <div class="modules-header">
+                <div>
+                    <span class="label">/03 — How it works</span>
+                    <h2 style="margin-top: 1rem;">The KiBuild Pipeline.</h2>
+                </div>
+                <div class="right-meta">
+                    Drag / scroll<br>to traverse →
+                </div>
+            </div>
+
+            <div class="modules-track" id="modules-track">
+                <div class="module-card">
+                    <div class="num">STEP_01 / SOURCE</div>
+                    <div class="visual">
+                        <pre>FileMaker File
+       │
+       ▼
+Tools → Save a Copy
+       as XML...</pre>
+                        <span class="corner-tag">FM_2025+</span>
+                    </div>
+                    <h3>Export XML</h3>
+                    <p class="desc">Export your schema from FileMaker using Tools → Save a Copy as XML… or via a script
+                        step. The exploder auto-detects the format. One file or many, 2025 or 2026.</p>
+                    <div class="metric"><span>Input</span><strong>.xml file</strong></div>
+                </div>
+
+                <div class="module-card">
+                    <div class="num">STEP_02 / EXPLODE</div>
+                    <div class="visual">
+                        <pre>explode_xml_export
+       │
+       ▼
+Schema/<db>/
+  scripts/
+  layouts/
+  tables/
+  relationships/
+  (one file per obj)</pre>
+                        <span class="corner-tag">M_01</span>
+                    </div>
+                    <h3>Explode Export</h3>
+                    <p class="desc">The AI calls explode_xml_export to split the XML into a per-object schema tree.
+                        Scripts, tables, layouts, relationships, value lists, custom functions — one file per object,
+                        ready for Git diffing.</p>
+                    <div class="metric"><span>Action</span><strong>Split XML</strong></div>
+                </div>
+
+                <div class="module-card">
+                    <div class="num">STEP_03 / INDEX</div>
+                    <div class="visual">
+                        <pre>generate_schema_map
+       │
+       ▼
+workspace_map.md
+(compact index, 
+ fast AI search)</pre>
+                        <span class="corner-tag">M_02</span>
+                    </div>
+                    <h3>Generate Map</h3>
+                    <p class="desc">The AI calls generate_schema_map to build workspace_map.md — a compact,
+                        token-efficient index of all schema objects. This is what makes KiBuild search instant without
+                        burning context.</p>
+                    <div class="metric"><span>Output</span><strong>workspace_map.md</strong></div>
+                </div>
+
+                <div class="module-card">
+                    <div class="num">STEP_04 / LIVE</div>
+                    <div class="visual">
+                        <pre>32 KiBuild tools
+       │
+       ▼
+  AI Tool (Claude)
+       │
+       ▼
+  "Where is Status
+   used?"</pre>
+                        <span class="corner-tag">32_TOOLS</span>
+                    </div>
+                    <h3>32 Tools Live</h3>
+                    <p class="desc">All navigation and reference tools are now live. Ask natural questions: Find the
+                        script "Create Invoice". Which scripts call "Send Email"? Where is the Status field used?</p>
+                    <div class="metric"><span>Status</span><strong>Ready</strong></div>
+                </div>
+            </div>
+
+            <div class="modules-progress-label" id="modules-progress-label">01 / 04</div>
+            <div class="modules-progress" id="modules-progress"></div>
+        </div>
+    </section>
+
+    <!-- Capabilities (Tool Categories) -->
+    <section class="capabilities" id="capabilities">
+        <div class="capabilities-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/04 — Tool Reference</div>
+                    <h2>32 tools.<br><span class="italic">4 disciplines.</span></h2>
+                </div>
+                <p>KiBuild MCP exposes 32 tools across four categories. No fluff, no overlapping utilities. Each tool
+                    solves a specific FileMaker navigation or impact-analysis problem.</p>
+            </div>
+
+            <div class="cap-row">
+                <div class="num">/01</div>
+                <h3>Schema navigation</h3>
+                <p>Find scripts, layouts, and tables by name. Inspect relationships. Keyword search the workspace_map.md
+                    index. Generate or refresh the schema map. The foundational lookup layer.</p>
+                <div class="tags">
+                    <span class="tag">find_script</span>
+                    <span class="tag">find_layout</span>
+                    <span class="tag">find_table</span>
+                    <span class="tag">inspect_relationships</span>
+                    <span class="tag">search_index</span>
+                    <span class="tag">generate_schema_map</span>
+                </div>
+            </div>
+
+            <div class="cap-row">
+                <div class="num">/02</div>
+                <h3>Impact analysis</h3>
+                <p>Trace where a script is called, where a field is used, or what references a table occurrence. Covers
+                    scripts, layouts, calculations, relationships, value lists, and variables.</p>
+                <div class="tags">
+                    <span class="tag">find_script_references</span>
+                    <span class="tag">find_field_references</span>
+                    <span class="tag">find_variable_references</span>
+                    <span class="tag">find_layout_references</span>
+                    <span class="tag">find_to_references</span>
+                    <span class="tag">find_relationship_predicates</span>
+                </div>
+            </div>
+
+            <div class="cap-row">
+                <div class="num">/03</div>
+                <h3>XML & generation</h3>
+                <p>Explode exports, extract steps, resolve IDs, trace dependencies, match revisions. Validate FMXML
+                    snippets and WebViewer HTML. Write versioned artifacts to the outbox.</p>
+                <div class="tags">
+                    <span class="tag">explode_xml_export</span>
+                    <span class="tag">xml_extract_steps</span>
+                    <span class="tag">xml_lookup_name</span>
+                    <span class="tag">validate_fmxmlsnippet</span>
+                    <span class="tag">write_outbox_artifact</span>
+                </div>
+            </div>
+
+            <div class="cap-row">
+                <div class="num">/04</div>
+                <h3>Specialist skills</h3>
+                <p>Load domain-specific expertise into AI context. Pro scriptwriter mode, script analysis, FM XML
+                    serializer, and script debugging. Skills shape how the AI applies the other 31 tools.</p>
+                <div class="tags">
+                    <span class="tag">load_skill</span>
+                    <span class="tag">pro_scriptwriter</span>
+                    <span class="tag">script_analysis</span>
+                    <span class="tag">fm_xml_serializer</span>
+                    <span class="tag">script_debug</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install in Seconds Section -->
+    <section class="install" id="install">
+        <div class="install-inner">
+            <div class="install-head reveal">
+                <div class="left">
+                    <div class="num-tag">/05 — Get Started</div>
+                    <h2>KiBuild <span class="italic">MCP.</span></h2>
+                </div>
+                <div class="right">
+                    <p>One binary. Zero dependencies. Install KiBuild MCP in seconds. The installer handles
+                        the PATH, the config, and the AI guides automatically.</p>
+                </div>
+            </div>
+
+            <!-- One Phrase Installation -->
+            <div class="one-phrase-install reveal">
+                <p style="color: var(--ink-soft); font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 1.5rem; letter-spacing: 0.15em; text-transform: uppercase;">Install with a single command — then run <span style="color: var(--neon-cyan);">/setup-kibuild</span> inside Claude Code</p>
+                <div class="command-box">
+                    <div class="cmd-content">
+                        <span class="cmd-symbol">$</span>
+                        <span class="typing-text">curl -fsSL https://raw.githubusercontent.com/KiBiz-Systems/kibuild-mcp/main/install.sh | sh</span>
+                        <span class="cursor-pipe">|</span>
+                    </div>
+                    <button class="copy-code-btn" id="copy-btn" onclick="copyInstallCommand()">Copy Code</button>
+                </div>
+            </div>
+
+            <div class="install-grid">
+                <!-- Step 1 -->
+                <div class="install-step">
+                    <div class="step-num">/01 — Download & Install</div>
+                    <h3>Install the binary</h3>
+                    <p>Run the interactive installer to download the binary, configure your PATH, and get the helper commands.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">macOS / Linux</div>
+                        <pre><span class="cmd">$</span> curl -fsSL https://raw.githubusercontent.com/KiBiz-Systems/kibuild-mcp/main/install.sh | sh</pre>
+                    </div>
+                    <div class="terminal">
+                        <div class="terminal-tab">Windows (PowerShell)</div>
+                        <pre><span class="cmd">&gt;</span> irm https://raw.githubusercontent.com/KiBiz-Systems/kibuild-mcp/main/install.ps1 | iex</pre>
+                    </div>
+                    <div class="note">Verify with: <code>kibuild-mcp --version</code></div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="install-step">
+                    <div class="step-num">/02 — Configure MCP</div>
+                    <h3>Run the setup wizard</h3>
+                    <p>Configure the MCP server for your AI environment (Claude Code, Cursor, Windsurf, Codex, etc.).</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">Terminal (Interactive)</div>
+                        <pre><span class="cmd">$</span> kibuild-mcp --setup</pre>
+                    </div>
+                    <div class="terminal">
+                        <div class="terminal-tab">Claude Code Command</div>
+                        <pre><span class="cmd">&gt;</span> /setup-kibuild</pre>
+                    </div>
+                    <div class="note">Writes configurations automatically.</div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="install-step">
+                    <div class="step-num">/03 — Export XML</div>
+                    <h3>Export your schema</h3>
+                    <p>Save a copy of your FileMaker schema as XML. In FM 2026+, export specific catalogs to speed up processing.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">FileMaker Script Step</div>
+                        <pre><span class="comment"># Save database as XML:</span>
+Save a Copy as XML [
+  Window Name: <span class="str">"MySolution"</span>;
+  Destination: <span class="str">"export.xml"</span>
+]</pre>
+                    </div>
+                    <div class="note">Or use Tools → Save a Copy as XML...</div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="install-step">
+                    <div class="step-num">/04 — Initialize & Run</div>
+                    <h3>Connect your project</h3>
+                    <p>Initialize the workspace guides in your project directory so your AI knows how to invoke the MCP server.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">Claude Code Command</div>
+                        <pre><span class="cmd">&gt;</span> /init-kibuild-project</pre>
+                    </div>
+                    <div class="terminal">
+                        <div class="terminal-tab">Verify MCP Server</div>
+                        <pre><span class="cmd">&gt;</span> /mcp
+<span class="out">kibuild: 32 tools active</span></pre>
+                    </div>
+                    <div class="note">Commit rules so your team stays aligned.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's Next: KiBuild Plugin -->
+    <section class="featured" id="whats-next">
+        <div class="featured-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/06 — What's Next</div>
+                    <h2>KiBuild Plugin.<br><span class="italic">Coming soon.</span></h2>
+                </div>
+                <p>KiHub's second project is a native FileMaker plugin that brings AI-assisted development capabilities
+                    directly inside FileMaker Pro — no external tooling required. Built by KiBiz Systems.</p>
+            </div>
+
+            <div class="featured-tool reveal">
+                <div class="featured-tool-header">
+                    <div>
+                        <h3>KiBuild Plugin</h3>
+                        <p>A native FileMaker plugin for AI-driven script writing, field analysis, and schema exploration — built on the same infrastructure as KiBuild MCP.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge" style="border-color: var(--hairline-strong); color: var(--ink-soft);">Upcoming</span>
+                        <span class="badge" style="border-color: var(--hairline-strong); color: var(--ink-soft);">KiBiz Systems</span>
+                    </div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="compare-col">
+                        <h4>What it will do</h4>
+                        <ul>
+                            <li><span class="icon">→</span><span>AI-assisted script writing directly inside FileMaker Pro — no external AI tool required.</span></li>
+                            <li><span class="icon">→</span><span>One-click field impact analysis: see where any field is used before you rename or delete it.</span></li>
+                            <li><span class="icon">→</span><span>Schema exploration panel — browse scripts, tables, and relationships from inside the FileMaker interface.</span></li>
+                            <li><span class="icon">→</span><span>Built on KiBuild MCP's structured schema engine — same reliability, native UX.</span></li>
+                        </ul>
+                    </div>
+                    <div class="compare-col">
+                        <h4>Get notified</h4>
+                        <ul>
+                            <li><span class="icon">→</span><span>Watch the <strong>KiBiz-Systems</strong> GitHub org for early access announcements.</span></li>
+                            <li><span class="icon">→</span><span>Star <strong>kibuild-mcp</strong> on GitHub — plugin release will be announced in the same repo.</span></li>
+                            <li><span class="icon">→</span><span>Open an issue or discussion on GitHub if you have feature requests or use cases to share.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="capabilities" id="community">
+        <div class="capabilities-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/07 — Community</div>
+                    <h2>Join the<br><span class="italic">conversation.</span></h2>
+                </div>
+                <p>KiHub is built in the open by KiBiz Systems. Share ideas, ask questions, report bugs, and follow what's next — all in GitHub Discussions. No sign-up required beyond a GitHub account.</p>
+            </div>
+
+            <div class="featured-tool reveal">
+                <div class="featured-tool-header">
+                    <div>
+                        <h3>GitHub Discussions</h3>
+                        <p>The official community hub for KiHub and KiBuild MCP. Feature requests, Q&amp;A, release announcements, and early previews of KiBuild Plugin — all in one place.</p>
+                    </div>
+                    <a href="https://github.com/KiBiz-Systems/kibuild-mcp/discussions/" target="_blank" rel="noopener noreferrer" class="badge" style="text-decoration: none; padding: 0.75rem 1.25rem; font-size: 11px; letter-spacing: 0.15em;">Join Discussions →</a>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="compare-col">
+                        <h4>How to subscribe</h4>
+                        <ul>
+                            <li><span class="icon">→</span><span>Go to the <strong>kibuild-mcp</strong> repo on GitHub and click <strong>Watch → All Activity</strong> to get notified of every discussion and release.</span></li>
+                            <li><span class="icon">→</span><span>Click <strong>Subscribe</strong> on any Discussion thread to follow that specific conversation.</span></li>
+                            <li><span class="icon">→</span><span>Star the repo to bookmark it and signal support — star counts are visible to the whole community.</span></li>
+                        </ul>
+                    </div>
+                    <div class="compare-col">
+                        <h4>What's discussed</h4>
+                        <ul>
+                            <li><span class="icon">→</span><span><strong>Announcements</strong> — release notes, new tool additions, and KiBuild Plugin previews.</span></li>
+                            <li><span class="icon">→</span><span><strong>Q&amp;A</strong> — installation help, configuration questions, and FileMaker schema setup.</span></li>
+                            <li><span class="icon">→</span><span><strong>Ideas</strong> — propose new MCP tools, suggest integrations, or share your use case.</span></li>
+                            <li><span class="icon">→</span><span><strong>Show &amp; Tell</strong> — share how you're using KiBuild MCP in your FileMaker projects.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="cta">
+        <div class="cta-inner">
+            <span class="label">/08 — Get started</span>
+            <h2>Stop grepping. <span class="italic">Start building.</span></h2>
+            <p>KiHub is KiBiz Systems' open-source platform for FileMaker and AI developers. KiBuild MCP is our first project. KiBuild Plugin is next. Pull requests welcome — open an issue first for significant changes.</p>
+            <div class="cta-actions">
+                <a href="https://github.com/KiBiz-Systems/kibuild-mcp" class="cta-btn">View on GitHub</a>
+                <a href="https://github.com/KiBiz-Systems/kibuild-mcp/discussions/" class="cta-btn ghost" target="_blank" rel="noopener noreferrer">Join Community</a>
+                <a href="#install" class="cta-btn ghost">Install KiBuild MCP</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="logo">KiHub / Open-Source</div>
+                    <p>An open-source platform by <a href="https://www.kibizsystems.com/" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">KiBiz Systems</a>. Building developer tools for FileMaker and AI. Free, MIT-licensed, and built to stay that way.</p>
+                    <div class="signals">
+                        <span>KiBiz Open Source</span>
+                        <span>Developer Platform</span>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Projects</h4>
+                    <ul>
+                        <li><a href="#">KiBuild MCP · Live</a></li>
+                        <li><a href="#">KiBuild Plugin · Upcoming</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="https://github.com/KiBiz-Systems/kibuild-mcp" target="_blank" rel="noopener noreferrer">GitHub Repo</a></li>
+                        <li><a href="https://github.com/KiBiz-Systems/kibuild-mcp/discussions/" target="_blank" rel="noopener noreferrer">Community Discussions</a></li>
+                        <li><a href="#">Tool Reference</a></li>
+                        <li><a href="#">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>KiBiz Systems</h4>
+                    <ul>
+                        <li><a href="https://www.kibizsystems.com/" target="_blank" rel="noopener noreferrer">KiBiz Systems</a></li>
+                        <li><a href="https://www.kibizsystems.com/kibiai/" target="_blank" rel="noopener noreferrer">KiBi-AI</a></li>
+                        <li><a href="https://www.kiflow.app/" target="_blank" rel="noopener noreferrer">KiFlow</a></li>
+                        <li><a href="https://www.kibizsystems.com/contact-kibiz/" target="_blank" rel="noopener noreferrer">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 KiBiz Systems · KiHub Open Source · MIT License</span>
+                <span class="status">All systems operational · 32 tools live</span>
+                <span>v0.2.0 / build 2025.01.18</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Three.js importmap -->
+    <script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.183/build/three.module.js" } }
+</script>
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+        // === Custom cursor ===
+        if (isFinePointer) {
+            const dot = document.querySelector('.cursor-dot');
+            const ring = document.querySelector('.cursor-ring');
+            let mx = 0, my = 0, rx = 0, ry = 0;
+
+            addEventListener('mousemove', e => {
+                mx = e.clientX; my = e.clientY;
+                dot.classList.add('is-visible');
+                ring.classList.add('is-visible');
+                dot.style.transform = `translate(${mx - 3}px, ${my - 3}px)`;
+            });
+
+            addEventListener('mouseleave', () => {
+                dot.classList.remove('is-visible');
+                ring.classList.remove('is-visible');
+            });
+
+            (function tick() {
+                rx += (mx - rx) * 0.15;
+                ry += (my - ry) * 0.15;
+                ring.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+                requestAnimationFrame(tick);
+            })();
+
+            document.querySelectorAll('a, button, .module-card, .cap-row, .terminal, .cta-btn, .install-step').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    ring.style.width = '60px';
+                    ring.style.height = '60px';
+                });
+                el.addEventListener('mouseleave', () => {
+                    ring.style.width = '32px';
+                    ring.style.height = '32px';
+                });
+            });
+        }
+
+        // === Particle field background ===
+        const canvas = document.getElementById('bg-canvas');
+        let bgActive = true;
+
+        if (!prefersReduced) {
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+            renderer.setSize(innerWidth, innerHeight);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+            camera.position.z = 6;
+
+            const isMobile = innerWidth < 768;
+            const COUNT = isMobile ? 600 : 1200;
+            const positions = new Float32Array(COUNT * 3);
+            const sizes = new Float32Array(COUNT);
+            const offsets = new Float32Array(COUNT);
+
+            for (let i = 0; i < COUNT; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 18;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 12;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 12;
+                sizes[i] = Math.random() * 1.6 + 0.4;
+                offsets[i] = Math.random() * Math.PI * 2;
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+            geo.setAttribute('aOffset', new THREE.BufferAttribute(offsets, 1));
+
+            const vertexShader = `
+    attribute float aSize;
+    attribute float aOffset;
+    uniform float uTime;
+    varying float vAlpha;
+    void main() {
+      vec3 p = position;
+      p.y += sin(uTime*0.3 + aOffset) * 0.4;
+      p.x += cos(uTime*0.25 + aOffset*0.7) * 0.2;
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      gl_PointSize = aSize * (180.0 / -mv.z);
+      gl_Position = projectionMatrix * mv;
+      vAlpha = 0.55 + 0.45 * sin(uTime*0.6 + aOffset);
+    }`;
+
+            const fragmentShader = `
+    varying float vAlpha;
+    uniform vec3 uColor;
+    void main() {
+      vec2 uv = gl_PointCoord - vec2(0.5);
+      if (length(uv) > 0.5) discard;
+      gl_FragColor = vec4(uColor, smoothstep(0.5, 0.0, length(uv)) * vAlpha * 0.4);
+    }`;
+
+            const matWhite = new THREE.ShaderMaterial({
+                uniforms: { uTime: { value: 0 }, uColor: { value: new THREE.Color(0xffffff) } },
+                vertexShader, fragmentShader,
+                transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+            });
+
+            const matCyan = new THREE.ShaderMaterial({
+                uniforms: { uTime: { value: 0 }, uColor: { value: new THREE.Color(0x00D4FF) } },
+                vertexShader, fragmentShader,
+                transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+            });
+
+            const points = new THREE.Points(geo, matWhite);
+            scene.add(points);
+
+            const cyanCount = Math.floor(COUNT * 0.15);
+            const cyanPos = new Float32Array(cyanCount * 3);
+            const cyanSizes = new Float32Array(cyanCount);
+            const cyanOff = new Float32Array(cyanCount);
+            for (let i = 0; i < cyanCount; i++) {
+                cyanPos[i * 3] = (Math.random() - 0.5) * 18;
+                cyanPos[i * 3 + 1] = (Math.random() - 0.5) * 12;
+                cyanPos[i * 3 + 2] = (Math.random() - 0.5) * 12;
+                cyanSizes[i] = Math.random() * 2 + 0.5;
+                cyanOff[i] = Math.random() * Math.PI * 2;
+            }
+            const cyanGeo = new THREE.BufferGeometry();
+            cyanGeo.setAttribute('position', new THREE.BufferAttribute(cyanPos, 3));
+            cyanGeo.setAttribute('aSize', new THREE.BufferAttribute(cyanSizes, 1));
+            cyanGeo.setAttribute('aOffset', new THREE.BufferAttribute(cyanOff, 1));
+            const cyanPoints = new THREE.Points(cyanGeo, matCyan);
+            scene.add(cyanPoints);
+
+            const heroSection = document.querySelector('.hero');
+            const bgObs = new IntersectionObserver((entries) => {
+                bgActive = entries[0].isIntersecting;
+            }, { threshold: 0 });
+            bgObs.observe(heroSection);
+
+            const mouseTarget = { x: 0, y: 0 };
+            const mouseCurrent = { x: 0, y: 0 };
+            if (isFinePointer) {
+                addEventListener('mousemove', e => {
+                    mouseTarget.x = (e.clientX / innerWidth - 0.5) * 0.3;
+                    mouseTarget.y = (e.clientY / innerHeight - 0.5) * 0.3;
+                });
+            }
+
+            const clock = new THREE.Clock();
+            function renderLoop() {
+                if (bgActive) {
+                    const t = clock.getElapsedTime();
+                    matWhite.uniforms.uTime.value = t;
+                    matCyan.uniforms.uTime.value = t;
+                    mouseCurrent.x += (mouseTarget.x - mouseCurrent.x) * 0.05;
+                    mouseCurrent.y += (mouseTarget.y - mouseCurrent.y) * 0.05;
+                    scene.rotation.y = mouseCurrent.x;
+                    scene.rotation.x = mouseCurrent.y;
+                    renderer.render(scene, camera);
+                }
+                requestAnimationFrame(renderLoop);
+            }
+            renderLoop();
+
+            addEventListener('resize', () => {
+                camera.aspect = innerWidth / innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(innerWidth, innerHeight);
+            });
+        }
+
+        // === Hero scramble decode ===
+        const TARGET = 'KiHub';
+        const CHARS = '!<>-_\\/[]{}—=+*^?#________01';
+        const heroTitle = document.getElementById('hero-title');
+
+        if (prefersReduced) {
+            heroTitle.textContent = TARGET;
+        } else {
+            heroTitle.classList.add('is-decoding');
+            let iter = 0;
+            const max = TARGET.length * 8;
+            (function tick() {
+                heroTitle.textContent = TARGET.split('').map((ch, i) =>
+                    i < iter / 8 ? TARGET[i] : (ch === ' ' ? ' ' : CHARS[Math.floor(Math.random() * CHARS.length)])
+                ).join('');
+                iter += 1;
+                if (iter >= max) {
+                    heroTitle.textContent = TARGET;
+                    heroTitle.classList.remove('is-decoding');
+                    return;
+                }
+                setTimeout(tick, 50);
+            })();
+        }
+
+        // === GSAP / ScrollTrigger ===
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Manifesto scrub blur words
+        if (!prefersReduced) {
+            document.fonts.ready.then(() => {
+                const textEl = document.getElementById('manifesto-text');
+                const words = textEl.textContent.trim().split(/\s+/);
+                textEl.innerHTML = words.map(w => `<span class="word">${w}</span>`).join(' ');
+
+                gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.manifesto',
+                        start: 'top 75%',
+                        end: 'center 50%',
+                        scrub: true,
+                    },
+                }).fromTo('.manifesto-text .word',
+                    { opacity: 0, filter: 'blur(12px) brightness(30%)' },
+                    { opacity: 1, filter: 'blur(0px) brightness(100%)', stagger: 0.04, ease: 'sine.out' });
+            });
+        } else {
+            const textEl = document.getElementById('manifesto-text');
+            const words = textEl.textContent.trim().split(/\s+/);
+            textEl.innerHTML = words.map(w => `<span class="word" style="opacity:1;filter:none;">${w}</span>`).join(' ');
+        }
+
+        // Reveal on scroll
+        const revealObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('is-in');
+                    revealObs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+        // Stagger reveals
+        if (!prefersReduced) {
+            document.querySelectorAll('.cap-row').forEach((row, i) => {
+                gsap.from(row, {
+                    scrollTrigger: { trigger: row, start: 'top 88%' },
+                    y: 40, opacity: 0, duration: 1, ease: 'power3.out', delay: i * 0.08
+                });
+            });
+
+            gsap.from('.install-step', {
+                scrollTrigger: { trigger: '.install-grid', start: 'top 80%' },
+                y: 60, opacity: 0, duration: 1.2, stagger: 0.15, ease: 'power3.out'
+            });
+
+            gsap.from('.cta-inner > *', {
+                scrollTrigger: { trigger: '.cta', start: 'top 75%' },
+                y: 40, opacity: 0, duration: 1, stagger: 0.1, ease: 'power3.out'
+            });
+
+            ScrollTrigger.create({
+                start: 100,
+                onUpdate: (self) => {
+                    const nav = document.querySelector('nav.top');
+                    if (window.scrollY > 100) {
+                        nav.style.padding = '1rem 2rem';
+                    } else {
+                        nav.style.padding = '1.4rem 2rem';
+                    }
+                }
+            });
+        }
+
+        // === Horizontal pin scroll for modules (desktop only) ===
+        const track = document.getElementById('modules-track');
+        const progress = document.getElementById('modules-progress');
+        const progressLabel = document.getElementById('modules-progress-label');
+
+        if (window.matchMedia('(min-width: 1024px)').matches) {
+            const cards = gsap.utils.toArray('.module-card');
+            const scrollWidth = track.scrollWidth - window.innerWidth;
+
+            gsap.to(track, {
+                x: -scrollWidth,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.modules-viewport',
+                    pin: true,
+                    scrub: true,
+                    start: 'top top',
+                    end: () => `+=${scrollWidth}`,
+                    invalidateOnRefresh: true,
+                    onUpdate: (self) => {
+                        const p = self.progress;
+                        if (progress) progress.style.setProperty('--p', (p * 100) + '%');
+                        if (progressLabel) {
+                            const idx = Math.min(cards.length, Math.max(1, Math.ceil(p * cards.length) || 1));
+                            progressLabel.textContent = String(idx).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+                        }
+                        
+                        if (!prefersReduced) {
+                            const skew = Math.max(-8, Math.min(8, self.getVelocity() * -0.003));
+                            cards.forEach(c => {
+                                c.style.transform = `skewX(${skew}deg)`;
+                            });
+                        }
+                    },
+                    onLeave: () => {
+                        if (!prefersReduced) {
+                            cards.forEach(c => c.style.transform = 'skewX(0deg)');
+                        }
+                    },
+                    onLeaveBack: () => {
+                        if (!prefersReduced) {
+                            cards.forEach(c => c.style.transform = 'skewX(0deg)');
+                        }
+                    }
+                }
+            });
+        }
+
+        // === One Phrase Typing Animation ===
+        if (!prefersReduced) {
+            gsap.from('.typing-text', {
+                scrollTrigger: {
+                    trigger: '.one-phrase-install',
+                    start: 'top 80%',
+                },
+                width: 0,
+                duration: 2.5,
+                ease: 'steps(60)'
+            });
+        }
+
+        // === Copy Install Command Script ===
+        function copyInstallCommand() {
+            const cmdText = "curl -fsSL https://raw.githubusercontent.com/KiBiz-Systems/kibuild-mcp/main/install.sh | sh";
+            navigator.clipboard.writeText(cmdText).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = 'Copied!';
+                btn.style.background = 'var(--neon-cyan)';
+                btn.style.color = 'var(--void-black)';
+                btn.style.borderColor = 'var(--neon-cyan)';
+                setTimeout(() => {
+                    btn.textContent = 'Copy Code';
+                    btn.style.background = 'rgba(0, 212, 255, 0.1)';
+                    btn.style.color = 'var(--neon-cyan)';
+                    btn.style.borderColor = 'rgba(0, 212, 255, 0.3)';
+                }, 2000);
+            });
+        }
+        window.copyInstallCommand = copyInstallCommand;
+
+        // === Smooth anchor scrolling ===
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const id = link.getAttribute('href');
+                if (id === '#' || id.length < 2) return;
+                const target = document.querySelector(id);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
