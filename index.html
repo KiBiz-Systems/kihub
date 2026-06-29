@@ -2662,24 +2662,57 @@ Save a Copy as XML [
         }
         window.copyInstallCommand = copyInstallCommand;
 
-        // === Floating KiHub icon — drag + mouse physics + scroll rotation ===
+        // === Floating KiHub icon — drag + node-hotspot physics + scroll rotation ===
         const floatIcon = document.getElementById('hero-icon-float');
         if (floatIcon && !prefersReduced) {
             let dragX = 0, dragY = 0, startX = 0, startY = 0, isDragging = false;
 
-            // Physics state
-            let angVel = 0;       // degrees per ms
-            let totalRot = 0;     // accumulated physics rotation
-            const DAMPING = 0.985;
-            const SENSITIVITY = 90;
-            const MAX_VEL = 20;
+            // Physics
+            let angVel = 0;
+            let totalRot = 0;
+            const DAMPING    = 0.993;   // slow, smooth coast
+            const SENSITIVITY = 28;     // gentle response
+            const MAX_VEL    = 6;       // cap — no wild spinning
+            const MIN_SPEED  = 0.3;     // px/ms threshold — ignore tiny jitter
 
-            // Scroll state
+            // Scroll
             let scrollRot = 0, targetScrollRot = 0;
+
+            // Three outer node positions in SVG viewBox (100×100, centre 50,50)
+            const NODE_SVG = [
+                { x:  0,   y: -40 },  // top
+                { x: -37,  y:  27 },  // bottom-left
+                { x:  37,  y:  27 },  // bottom-right
+            ];
+            const HOTSPOT_FRAC = 0.20; // hotspot radius as fraction of icon width
 
             function getCenter() {
                 const r = floatIcon.getBoundingClientRect();
                 return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            }
+
+            // Returns screen-space positions of the three nodes, accounting for current rotation
+            function getNodePositions() {
+                const c    = getCenter();
+                const rect = floatIcon.getBoundingClientRect();
+                const scale = rect.width / 100;
+                const rot   = (totalRot + scrollRot) * Math.PI / 180;
+                const cosR  = Math.cos(rot), sinR = Math.sin(rot);
+                return NODE_SVG.map(n => {
+                    const sx = n.x * scale, sy = n.y * scale;
+                    return {
+                        x: c.x + sx * cosR - sy * sinR,
+                        y: c.y + sx * sinR + sy * cosR,
+                    };
+                });
+            }
+
+            function nearANode(mx, my) {
+                const hr = floatIcon.getBoundingClientRect().width * HOTSPOT_FRAC;
+                return getNodePositions().some(n => {
+                    const dx = mx - n.x, dy = my - n.y;
+                    return Math.sqrt(dx * dx + dy * dy) < hr;
+                });
             }
 
             function applyTransform() {
@@ -2697,43 +2730,48 @@ Save a Copy as XML [
                 floatIcon.style.cursor = 'grabbing';
                 e.preventDefault();
             });
-
             window.addEventListener('pointermove', e => {
                 if (!isDragging) return;
                 dragX = e.clientX - startX;
                 dragY = e.clientY - startY;
                 applyTransform();
             });
-
             window.addEventListener('pointerup', () => {
                 isDragging = false;
                 floatIcon.style.cursor = 'grab';
             });
 
-            // Mouse physics — angular velocity from mouse sweep
+            // Mouse physics — only from node hotspots
             let prevMX = 0, prevMY = 0, prevMT = performance.now();
 
             window.addEventListener('mousemove', e => {
                 const now = performance.now();
-                const dt = now - prevMT;
+                const dt  = now - prevMT;
 
                 if (dt > 0 && dt < 80 && !isDragging) {
-                    const c = getCenter();
-                    const rx = e.clientX - c.x;
-                    const ry = e.clientY - c.y;
-                    const rLen = Math.sqrt(rx * rx + ry * ry);
+                    // Cursor hint
+                    floatIcon.style.cursor = nearANode(e.clientX, e.clientY) ? 'crosshair' : 'grab';
 
-                    // Only activate within the icon's edge rim (40%–130% of icon radius)
-                    const iconRadius = floatIcon.getBoundingClientRect().width / 2;
-                    const inRim = rLen >= iconRadius * 0.4 && rLen <= iconRadius * 1.3;
-
-                    if (inRim) {
+                    if (nearANode(e.clientX, e.clientY)) {
                         const vx = (e.clientX - prevMX) / dt;
                         const vy = (e.clientY - prevMY) / dt;
-                        // 2D cross product gives signed angular speed (rad/ms)
-                        const cross = (rx * vy - ry * vx) / (rLen * rLen);
-                        angVel += cross * SENSITIVITY;
-                        angVel = Math.max(-MAX_VEL, Math.min(MAX_VEL, angVel));
+                        const speed = Math.sqrt(vx * vx + vy * vy);
+
+                        // Require intentional movement — ignore micro-jitter
+                        if (speed > MIN_SPEED) {
+                            const c    = getCenter();
+                            const rx   = e.clientX - c.x;
+                            const ry   = e.clientY - c.y;
+                            const rLen = Math.sqrt(rx * rx + ry * ry);
+
+                            if (rLen > 5) {
+                                const cross   = (rx * vy - ry * vx) / (rLen * rLen);
+                                const impulse = cross * SENSITIVITY;
+                                // Smooth blend — no sudden jumps
+                                angVel = angVel * 0.7 + impulse * 0.3;
+                                angVel = Math.max(-MAX_VEL, Math.min(MAX_VEL, angVel));
+                            }
+                        }
                     }
                 }
 
@@ -2742,9 +2780,9 @@ Save a Copy as XML [
                 prevMT = now;
             });
 
-            // Scroll adds gentle base rotation
+            // Scroll — very gentle and gradual
             window.addEventListener('scroll', () => {
-                targetScrollRot = window.scrollY * 0.1;
+                targetScrollRot = window.scrollY * 0.04;
             });
 
             // Physics loop
@@ -2753,14 +2791,9 @@ Save a Copy as XML [
                 const dt = Math.min(ts - lastFrame, 50);
                 lastFrame = ts;
 
-                // Friction damping (frame-rate independent)
-                angVel *= Math.pow(DAMPING, dt / 16);
-
-                // Accumulate rotation
-                totalRot += angVel * dt;
-
-                // Scroll lerp
-                scrollRot += (targetScrollRot - scrollRot) * 0.06;
+                angVel    *= Math.pow(DAMPING, dt / 16);
+                totalRot  += angVel * dt;
+                scrollRot += (targetScrollRot - scrollRot) * 0.015;
 
                 applyTransform();
                 requestAnimationFrame(physicsLoop);
