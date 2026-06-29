@@ -160,12 +160,9 @@
             gap: 0.6rem;
         }
 
-        nav.top .logo::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 12px var(--neon-cyan);
+        nav.top .logo svg {
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 6px var(--neon-cyan));
         }
 
         nav.top ul {
@@ -1246,12 +1243,9 @@
             letter-spacing: -0.02em;
         }
 
-        .footer-brand .logo::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 12px var(--neon-cyan);
+        .footer-brand .logo svg {
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
         }
 
         .footer-brand p {
@@ -1662,7 +1656,18 @@
 
     <!-- Top navigation -->
     <nav class="top">
-        <div class="logo">KiHub / Open-Source</div>
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="10" cy="10" r="2.6" fill="var(--neon-cyan)"/>
+                <circle cx="10" cy="1.8" r="1.8" fill="var(--neon-cyan)"/>
+                <circle cx="2.8" cy="15.6" r="1.8" fill="var(--neon-cyan)"/>
+                <circle cx="17.2" cy="15.6" r="1.8" fill="var(--neon-cyan)"/>
+                <line x1="10" y1="7.4" x2="10" y2="3.6" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+                <line x1="7.8" y1="11.3" x2="4.3" y2="14.2" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+                <line x1="12.2" y1="11.3" x2="15.7" y2="14.2" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            KiHub / Open-Source
+        </div>
         <ul>
             <li><a href="#featured">KiBuild MCP</a></li>
             <li><a href="#pipeline">How It Works</a></li>
@@ -2172,7 +2177,18 @@ Save a Copy as XML [
         <div class="footer-inner">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <div class="logo">KiHub / Open-Source</div>
+                    <div class="logo">
+                        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <circle cx="10" cy="10" r="2.6" fill="var(--neon-cyan)"/>
+                            <circle cx="10" cy="1.8" r="1.8" fill="var(--neon-cyan)"/>
+                            <circle cx="2.8" cy="15.6" r="1.8" fill="var(--neon-cyan)"/>
+                            <circle cx="17.2" cy="15.6" r="1.8" fill="var(--neon-cyan)"/>
+                            <line x1="10" y1="7.4" x2="10" y2="3.6" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+                            <line x1="7.8" y1="11.3" x2="4.3" y2="14.2" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+                            <line x1="12.2" y1="11.3" x2="15.7" y2="14.2" stroke="var(--neon-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+                        </svg>
+                        KiHub / Open-Source
+                    </div>
                     <p>An open-source platform by <a href="https://www.kibizsystems.com/" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">KiBiz Systems</a>. Building developer tools for FileMaker and AI. Free, MIT-licensed, and built to stay that way.</p>
                     <div class="signals">
                         <span>KiBiz Open Source</span>
