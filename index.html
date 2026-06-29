@@ -1739,8 +1739,6 @@
         <!-- Floating draggable KiHub icon -->
         <div class="hero-icon-float" id="hero-icon-float" title="Drag me">
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <!-- Outer orbit ring -->
-                <circle cx="50" cy="50" r="46" stroke="var(--neon-cyan)" stroke-width="0.7" stroke-dasharray="5 7" fill="none" opacity="0.2"/>
                 <!-- Ripple rings on outer nodes -->
                 <circle class="node-ripple" cx="50" cy="10" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:0s"/>
                 <circle class="node-ripple" cx="13" cy="77" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:0.9s"/>
@@ -2664,32 +2662,43 @@ Save a Copy as XML [
         }
         window.copyInstallCommand = copyInstallCommand;
 
-        // === Floating KiHub icon — drag + scroll rotation ===
+        // === Floating KiHub icon — drag + mouse physics + scroll rotation ===
         const floatIcon = document.getElementById('hero-icon-float');
         if (floatIcon && !prefersReduced) {
-            let dragX = 0, dragY = 0;
-            let startX = 0, startY = 0;
-            let isDragging = false;
-            let targetRot = 0, currentRot = 0;
+            let dragX = 0, dragY = 0, startX = 0, startY = 0, isDragging = false;
+
+            // Physics state
+            let angVel = 0;       // degrees per ms
+            let totalRot = 0;     // accumulated physics rotation
+            const DAMPING = 0.985;
+            const SENSITIVITY = 90;
+            const MAX_VEL = 20;
+
+            // Scroll state
+            let scrollRot = 0, targetScrollRot = 0;
+
+            function getCenter() {
+                const r = floatIcon.getBoundingClientRect();
+                return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            }
 
             function applyTransform() {
                 floatIcon.style.setProperty('--drag-x', dragX + 'px');
                 floatIcon.style.setProperty('--drag-y', dragY + 'px');
-                floatIcon.style.setProperty('--rot', currentRot + 'deg');
+                floatIcon.style.setProperty('--rot', (totalRot + scrollRot) + 'deg');
             }
 
-            // Drag (pointer events handle both mouse and touch)
-            floatIcon.addEventListener('pointerdown', (e) => {
+            // Drag
+            floatIcon.addEventListener('pointerdown', e => {
                 isDragging = true;
                 startX = e.clientX - dragX;
                 startY = e.clientY - dragY;
                 floatIcon.setPointerCapture(e.pointerId);
                 floatIcon.style.cursor = 'grabbing';
-                floatIcon.style.filter = 'drop-shadow(0 0 36px rgba(0,212,255,0.75)) drop-shadow(0 0 90px rgba(0,212,255,0.3))';
                 e.preventDefault();
             });
 
-            window.addEventListener('pointermove', (e) => {
+            window.addEventListener('pointermove', e => {
                 if (!isDragging) return;
                 dragX = e.clientX - startX;
                 dragY = e.clientY - startY;
@@ -2697,22 +2706,63 @@ Save a Copy as XML [
             });
 
             window.addEventListener('pointerup', () => {
-                if (!isDragging) return;
                 isDragging = false;
                 floatIcon.style.cursor = 'grab';
-                floatIcon.style.filter = '';
             });
 
-            // Scroll → rotate (smooth lerp)
+            // Mouse physics — angular velocity from mouse sweep
+            let prevMX = 0, prevMY = 0, prevMT = performance.now();
+
+            window.addEventListener('mousemove', e => {
+                const now = performance.now();
+                const dt = now - prevMT;
+
+                if (dt > 0 && dt < 80 && !isDragging) {
+                    const c = getCenter();
+                    const rx = e.clientX - c.x;
+                    const ry = e.clientY - c.y;
+                    const rLen = Math.sqrt(rx * rx + ry * ry);
+
+                    if (rLen > 5 && rLen < 600) {
+                        const vx = (e.clientX - prevMX) / dt;
+                        const vy = (e.clientY - prevMY) / dt;
+                        // 2D cross product gives signed angular speed (rad/ms)
+                        const cross = (rx * vy - ry * vx) / (rLen * rLen);
+                        // Closer mouse = stronger effect
+                        const proximity = Math.max(0, 1 - rLen / 450);
+                        angVel += cross * SENSITIVITY * (1 + proximity * 2);
+                        angVel = Math.max(-MAX_VEL, Math.min(MAX_VEL, angVel));
+                    }
+                }
+
+                prevMX = e.clientX;
+                prevMY = e.clientY;
+                prevMT = now;
+            });
+
+            // Scroll adds gentle base rotation
             window.addEventListener('scroll', () => {
-                targetRot = window.scrollY * 0.14;
+                targetScrollRot = window.scrollY * 0.1;
             });
 
-            (function animateRot() {
-                currentRot += (targetRot - currentRot) * 0.07;
+            // Physics loop
+            let lastFrame = performance.now();
+            (function physicsLoop(ts) {
+                const dt = Math.min(ts - lastFrame, 50);
+                lastFrame = ts;
+
+                // Friction damping (frame-rate independent)
+                angVel *= Math.pow(DAMPING, dt / 16);
+
+                // Accumulate rotation
+                totalRot += angVel * dt;
+
+                // Scroll lerp
+                scrollRot += (targetScrollRot - scrollRot) * 0.06;
+
                 applyTransform();
-                requestAnimationFrame(animateRot);
-            })();
+                requestAnimationFrame(physicsLoop);
+            })(performance.now());
         }
 
         // === Smooth anchor scrolling ===
