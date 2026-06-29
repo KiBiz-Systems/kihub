@@ -1645,6 +1645,59 @@
                 display: none;
             }
         }
+
+        /* === Floating KiHub hero icon === */
+        .hero-icon-float {
+            position: absolute;
+            right: 9%;
+            top: 50%;
+            width: clamp(200px, 24vw, 340px);
+            z-index: 3;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            --drag-x: 0px;
+            --drag-y: 0px;
+            --rot: 0deg;
+            transform: translateY(-50%) translate(var(--drag-x), var(--drag-y)) rotate(var(--rot));
+            will-change: transform;
+        }
+
+        .hero-icon-float:active { cursor: grabbing; }
+
+        .hero-icon-float svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            filter: drop-shadow(0 0 24px rgba(0, 212, 255, 0.5)) drop-shadow(0 0 70px rgba(0, 212, 255, 0.18));
+        }
+
+        .hero-icon-float .node-ripple {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: nodeRipple 2.8s ease-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes nodeRipple {
+            0%   { transform: scale(1);   opacity: 0.55; }
+            100% { transform: scale(2.8); opacity: 0; }
+        }
+
+        .hero-icon-float .line-pulse {
+            animation: linePulse 2.8s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.55; }
+            50%       { opacity: 1; }
+        }
+
+        @media (max-width: 900px) {
+            .hero-icon-float {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -1682,6 +1735,37 @@
     <!-- Hero -->
     <section class="hero">
         <canvas class="hero-bg" id="bg-canvas"></canvas>
+
+        <!-- Floating draggable KiHub icon -->
+        <div class="hero-icon-float" id="hero-icon-float" title="Drag me">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Outer orbit ring -->
+                <circle cx="50" cy="50" r="46" stroke="var(--neon-cyan)" stroke-width="0.7" stroke-dasharray="5 7" fill="none" opacity="0.2"/>
+                <!-- Ripple rings on outer nodes -->
+                <circle class="node-ripple" cx="50" cy="10" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:0s"/>
+                <circle class="node-ripple" cx="13" cy="77" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:0.9s"/>
+                <circle class="node-ripple" cx="87" cy="77" r="9" stroke="var(--neon-cyan)" stroke-width="1" fill="none" style="animation-delay:1.8s"/>
+                <!-- Connection lines -->
+                <line class="line-pulse" x1="50" y1="38" x2="50" y2="19" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round" style="animation-delay:0s"/>
+                <line class="line-pulse" x1="39" y1="57" x2="21" y2="69" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round" style="animation-delay:0.9s"/>
+                <line class="line-pulse" x1="61" y1="57" x2="79" y2="69" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round" style="animation-delay:1.8s"/>
+                <!-- Center node — layered glow -->
+                <circle cx="50" cy="50" r="14" fill="var(--neon-cyan)" opacity="0.08"/>
+                <circle cx="50" cy="50" r="9"  fill="var(--neon-cyan)" opacity="0.25"/>
+                <circle cx="50" cy="50" r="5.5" fill="var(--neon-cyan)"/>
+                <!-- Outer nodes -->
+                <circle cx="50" cy="10" r="10" fill="var(--neon-cyan)" opacity="0.1"/>
+                <circle cx="50" cy="10" r="6"  fill="var(--neon-cyan)" opacity="0.4"/>
+                <circle cx="50" cy="10" r="3.5" fill="var(--neon-cyan)"/>
+                <circle cx="13" cy="77" r="10" fill="var(--neon-cyan)" opacity="0.1"/>
+                <circle cx="13" cy="77" r="6"  fill="var(--neon-cyan)" opacity="0.4"/>
+                <circle cx="13" cy="77" r="3.5" fill="var(--neon-cyan)"/>
+                <circle cx="87" cy="77" r="10" fill="var(--neon-cyan)" opacity="0.1"/>
+                <circle cx="87" cy="77" r="6"  fill="var(--neon-cyan)" opacity="0.4"/>
+                <circle cx="87" cy="77" r="3.5" fill="var(--neon-cyan)"/>
+            </svg>
+        </div>
+
         <div class="hero-content">
             <div class="hero-meta">
                 <div class="label-row">
@@ -2579,6 +2663,57 @@ Save a Copy as XML [
             });
         }
         window.copyInstallCommand = copyInstallCommand;
+
+        // === Floating KiHub icon — drag + scroll rotation ===
+        const floatIcon = document.getElementById('hero-icon-float');
+        if (floatIcon && !prefersReduced) {
+            let dragX = 0, dragY = 0;
+            let startX = 0, startY = 0;
+            let isDragging = false;
+            let targetRot = 0, currentRot = 0;
+
+            function applyTransform() {
+                floatIcon.style.setProperty('--drag-x', dragX + 'px');
+                floatIcon.style.setProperty('--drag-y', dragY + 'px');
+                floatIcon.style.setProperty('--rot', currentRot + 'deg');
+            }
+
+            // Drag (pointer events handle both mouse and touch)
+            floatIcon.addEventListener('pointerdown', (e) => {
+                isDragging = true;
+                startX = e.clientX - dragX;
+                startY = e.clientY - dragY;
+                floatIcon.setPointerCapture(e.pointerId);
+                floatIcon.style.cursor = 'grabbing';
+                floatIcon.style.filter = 'drop-shadow(0 0 36px rgba(0,212,255,0.75)) drop-shadow(0 0 90px rgba(0,212,255,0.3))';
+                e.preventDefault();
+            });
+
+            window.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                dragX = e.clientX - startX;
+                dragY = e.clientY - startY;
+                applyTransform();
+            });
+
+            window.addEventListener('pointerup', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                floatIcon.style.cursor = 'grab';
+                floatIcon.style.filter = '';
+            });
+
+            // Scroll → rotate (smooth lerp)
+            window.addEventListener('scroll', () => {
+                targetRot = window.scrollY * 0.14;
+            });
+
+            (function animateRot() {
+                currentRot += (targetRot - currentRot) * 0.07;
+                applyTransform();
+                requestAnimationFrame(animateRot);
+            })();
+        }
 
         // === Smooth anchor scrolling ===
         document.querySelectorAll('a[href^="#"]').forEach(link => {
