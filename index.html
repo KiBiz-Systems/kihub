@@ -2723,14 +2723,16 @@ Save a Copy as XML [
                     const ry = e.clientY - c.y;
                     const rLen = Math.sqrt(rx * rx + ry * ry);
 
-                    if (rLen > 5 && rLen < 600) {
+                    // Only activate within the icon's edge rim (40%–130% of icon radius)
+                    const iconRadius = floatIcon.getBoundingClientRect().width / 2;
+                    const inRim = rLen >= iconRadius * 0.4 && rLen <= iconRadius * 1.3;
+
+                    if (inRim) {
                         const vx = (e.clientX - prevMX) / dt;
                         const vy = (e.clientY - prevMY) / dt;
                         // 2D cross product gives signed angular speed (rad/ms)
                         const cross = (rx * vy - ry * vx) / (rLen * rLen);
-                        // Closer mouse = stronger effect
-                        const proximity = Math.max(0, 1 - rLen / 450);
-                        angVel += cross * SENSITIVITY * (1 + proximity * 2);
+                        angVel += cross * SENSITIVITY;
                         angVel = Math.max(-MAX_VEL, Math.min(MAX_VEL, angVel));
                     }
                 }
