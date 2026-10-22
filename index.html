@@ -1538,6 +1538,50 @@
             box-shadow: none;
         }
 
+        /* Baseline reads as reference, the result reads as the win — same as .token-before / .token-after */
+        .meter.is-baseline .meter-head strong {
+            color: var(--ink-mute);
+        }
+
+        .meter.is-win .meter-head strong {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 12px rgba(0, 212, 255, 0.35);
+        }
+
+        /* The part of the bar the tools take off: dashed, shown once the fill lands */
+        .meter-track.has-saved {
+            margin-bottom: 1.6rem;
+        }
+
+        .meter-saved {
+            position: absolute;
+            left: var(--p);
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, rgba(0, 212, 255, 0.55) 0 6px, transparent 6px 11px);
+            opacity: 0;
+            transition: opacity 0.6s ease 1.6s;
+        }
+
+        .meter-saved span {
+            position: absolute;
+            top: 9px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            white-space: nowrap;
+        }
+
+        .reveal.is-in .meter-saved {
+            opacity: 1;
+        }
+
         .meter-sub {
             margin-top: 0.7rem;
             font-family: 'JetBrains Mono', monospace;
@@ -1670,7 +1714,8 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .meter-fill {
+            .meter-fill,
+            .meter-saved {
                 transition: none;
             }
         }
@@ -4129,15 +4174,16 @@ then paste in Script Workspace</pre>
                 <div class="impact-grid">
                     <div class="impact-col">
                         <h4>How long a change takes</h4>
-                        <div class="impact-hint">Shorter bar = faster</div>
-                        <div class="meter">
+                        <div class="impact-hint">Time per change · shorter bar = less time</div>
+                        <div class="token-task"><span>Same kind of change, by hand and with the tools</span><span class="token-save">~50% less time</span></div>
+                        <div class="meter is-baseline">
                             <div class="meter-head"><span>Doing it by hand</span><strong>100%</strong></div>
                             <div class="meter-track"><div class="meter-fill muted" style="--p: 100%;"></div></div>
                             <div class="meter-sub">Searching the file yourself and building every step in FileMaker's dialogs</div>
                         </div>
-                        <div class="meter">
+                        <div class="meter is-win">
                             <div class="meter-head"><span>With KiBuild MCP + FM Bridge</span><strong>~50%</strong></div>
-                            <div class="meter-track"><div class="meter-fill" style="--p: 50%;"></div></div>
+                            <div class="meter-track has-saved" style="--p: 50%;"><div class="meter-fill"></div><div class="meter-saved"><span>~50% time saved</span></div></div>
                             <div class="meter-sub">About half the time, across KiBiz Systems' own projects</div>
                         </div>
                     </div>
