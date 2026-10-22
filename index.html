@@ -2430,11 +2430,89 @@
             }
         }
 
-        /* ===== Demo film: code editor + AI chat with KiBuild, then FileMaker Script Workspace ===== */
-        .kfilm {
-            margin-top: 4rem;
+        /* Two-tool strip that introduces the demo film */
+        #demo .section-head {
+            margin-bottom: 3rem;
         }
 
+        .tool-intro {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            border: 1px solid var(--hairline-strong);
+            background: var(--void-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-intro-card {
+            padding: 1.75rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tool-intro-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .tool-intro-role {
+            color: var(--neon-cyan);
+        }
+
+        .tool-intro-steps {
+            color: var(--ink-mute);
+            white-space: nowrap;
+        }
+
+        .tool-intro-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: clamp(1.3rem, 2vw, 1.6rem);
+            letter-spacing: -0.02em;
+        }
+
+        .tool-intro-card p {
+            color: var(--ink-soft);
+            line-height: 1.6;
+        }
+
+        .tool-intro-plus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            border-left: 1px solid var(--hairline);
+            border-right: 1px solid var(--hairline);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        @media (max-width: 767px) {
+            .tool-intro {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-intro-card {
+                padding: 1.5rem;
+            }
+
+            .tool-intro-plus {
+                width: auto;
+                height: 2.5rem;
+                border: none;
+                border-top: 1px solid var(--hairline);
+                border-bottom: 1px solid var(--hairline);
+            }
+        }
+
+        /* ===== Demo film: code editor + AI chat with KiBuild, then FileMaker Script Workspace ===== */
         .kf-stage {
             position: relative;
             height: 640px;
@@ -3716,6 +3794,7 @@
             KiHub / Open-Source
         </div>
         <ul>
+            <li><a href="#demo">Demo</a></li>
             <li><a href="#tools">Tools</a></li>
             <li><a href="#workflow">Workflow</a></li>
             <li><a href="#install">Get Started</a></li>
@@ -3781,7 +3860,7 @@
             <p class="hero-subtitle"><strong>KiBuild MCP</strong> helps your AI assistant find scripts, trace field usage, and understand relationships from your FileMaker XML export. <strong>FM Bridge</strong> lets you edit script steps in your code editor, with or without AI, and paste them back into FileMaker. Two free tools: use either on its own, or bring them together in one workflow.</p>
             <div class="hero-actions">
                 <a href="#install" class="btn-primary">Get started →</a>
-                <a href="#workflow" class="btn-ghost">See the workflow</a>
+                <a href="#demo" class="btn-ghost">See it in action</a>
             </div>
             <div class="hero-bottom">
                 <div class="scroll-indicator">
@@ -3797,126 +3876,31 @@
         </div>
     </section>
 
-    <!-- Manifesto -->
-    <section class="manifesto">
-        <div class="manifesto-inner">
-            <div class="manifesto-label">
-                <span class="label">/01 — The KiHub mandate</span>
-            </div>
-            <p class="manifesto-text" id="manifesto-text">FileMaker solutions hold years of business logic, but AI tools struggle to find their way around them, and whatever an AI writes still has to be rebuilt by hand in Script Workspace. KiBuild MCP lets your AI find its way around your solution. FM Bridge turns scripts into text you can edit and paste back. KiBiz Systems built both for our own work and shares them free on KiHub. More tools will follow.</p>
-            <div class="manifesto-footer">
-                <span>Creator: KiBiz Systems · Open developer platform</span>
-                <span>KiBuild MCP: MIT · FM Bridge: source-available</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Tools -->
-    <section class="featured" id="tools">
+    <!-- Demo film -->
+    <section class="featured" id="demo">
         <div class="featured-inner">
             <div class="section-head reveal">
                 <div>
-                    <div class="num-tag">/02 — The tools</div>
-                    <h2>Two free tools.<br><span class="italic">Use one or both.</span></h2>
+                    <div class="num-tag">/01 — See it in action</div>
+                    <h2>KiBuild MCP<br><span class="italic">+ FM Bridge.</span></h2>
                 </div>
-                <p>KiBuild MCP helps your AI assistant work with your FileMaker solution. FM Bridge lets you edit script
-                    steps as text and paste them back. Each works on its own, and together they cover the whole change.</p>
+                <p>Watch an AI assistant use both tools on a made-up FileMaker solution, from the raw XML export to a
+                    new script pasted into Script Workspace. Use the buttons under the illustration to jump to any step.</p>
             </div>
 
-            <div class="projects-grid reveal">
-                <div class="project-card">
-                    <span class="project-role">Understand</span>
+            <div class="tool-intro reveal">
+                <div class="tool-intro-card">
+                    <div class="tool-intro-top"><span class="tool-intro-role">Understand</span><span class="tool-intro-steps">Steps 01–03</span></div>
                     <h3>KiBuild MCP</h3>
-                    <p>Helps your AI assistant find scripts, trace where fields are used, and follow relationships, using
-                        the XML export of your FileMaker solution.</p>
-                    <div class="project-needs">
-                        <span class="project-needs-label">You need</span>
-                        <span>An AI tool that supports MCP: Claude Code, VS Code (Copilot), Cursor, Codex, Gemini CLI,
-                            Windsurf, or Antigravity</span>
-                        <span>An XML export of your file (Tools → Save a Copy as XML)</span>
-                    </div>
-                    <div class="project-meta">
-                        <span>MIT License</span>
-                        <span>macOS · Windows · Linux</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="#install">Get started →</a>
-                        <a href="https://github.com/KiBiz-Systems/kibuild-mcp" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                    </div>
+                    <p>Gives your AI assistant a searchable map of your solution's XML export, so it can find scripts,
+                        trace where fields are used, and look up real table and field names before it writes.</p>
                 </div>
-                <div class="project-card">
-                    <span class="project-role">Edit &amp; paste back</span>
+                <div class="tool-intro-plus" aria-hidden="true">+</div>
+                <div class="tool-intro-card">
+                    <div class="tool-intro-top"><span class="tool-intro-role">Edit &amp; paste back</span><span class="tool-intro-steps">Steps 04–05</span></div>
                     <h3>FM Bridge</h3>
-                    <p>Lets you edit FileMaker script steps as plain text in your code editor, with or without AI, then
-                        paste them back into FileMaker.</p>
-                    <div class="project-needs">
-                        <span class="project-needs-label">You need</span>
-                        <span>VS Code, or an editor built on it: Cursor, Windsurf, or Antigravity</span>
-                        <span>FileMaker Pro on macOS or Windows</span>
-                    </div>
-                    <div class="project-meta">
-                        <span>Source-available · free to use</span>
-                        <span>macOS · Windows</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="#install-fm-bridge">Install →</a>
-                        <a href="https://github.com/KiBiz-Systems/FMBridge" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                        <a href="https://github.com/KiBiz-Systems/FMBridge/releases/latest" target="_blank" rel="noopener noreferrer">Latest release ↗</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Worked example -->
-    <section class="featured" id="workflow">
-        <div class="featured-inner">
-            <div class="section-head reveal">
-                <div>
-                    <div class="num-tag">/03 — The workflow</div>
-                    <h2>One change,<br><span class="italic">start to finish.</span></h2>
-                </div>
-                <p>A client asks: “Add a 1.5% late fee to invoices that are more than 30 days overdue.” Here is how that
-                    change goes with both tools. You can also use either tool on its own.</p>
-            </div>
-
-            <div class="install-grid grid-3 reveal">
-                <div class="install-step">
-                    <div class="step-num">/01 — Find what it touches</div>
-                    <h3>Ask before you change anything</h3>
-                    <p>Ask your AI which scripts and layouts use the invoice due date. KiBuild looks it up in your export,
-                        so you know what the change will touch before you open Script Workspace.</p>
-                    <div class="terminal">
-                        <div class="terminal-tab">Ask your AI</div>
-                        <pre>Which scripts and layouts use Invoices::DueDate?</pre>
-                    </div>
-                    <div class="note">KiBuild MCP</div>
-                </div>
-                <div class="install-step">
-                    <div class="step-num">/02 — Draft the change</div>
-                    <h3>Edit the script as text</h3>
-                    <p>Copy the steps of the invoice script in FileMaker and paste them into your editor with FM Bridge.
-                        Write the new steps yourself, or ask the AI to draft them, and review the result.</p>
-                    <div class="terminal">
-                        <div class="terminal-tab">In your editor · example</div>
-                        <pre><span class="comment"># Late fee after 30 days</span>
-If [ Get ( CurrentDate ) - Invoices::DueDate &gt; 30 ]
-    Set Field [ Invoices::LateFee ; Invoices::Total * 0.015 ]
-End If</pre>
-                    </div>
-                    <div class="note">FM Bridge · AI optional</div>
-                </div>
-                <div class="install-step">
-                    <div class="step-num">/03 — Paste &amp; test</div>
-                    <h3>Put it back in FileMaker</h3>
-                    <p>Press one shortcut to turn the text back into FileMaker steps, paste them into Script Workspace,
-                        and run the script on a test invoice.</p>
-                    <div class="terminal">
-                        <div class="terminal-tab">Shortcut</div>
-                        <pre>Cmd+Option+B <span class="comment">(Ctrl+Alt+B on Windows)</span>
-then paste in Script Workspace</pre>
-                    </div>
-                    <div class="note">FM Bridge</div>
+                    <p>Turns script steps into plain text in your code editor and back again, so a script you or the AI
+                        wrote pastes straight into Script Workspace.</p>
                 </div>
             </div>
 
@@ -4000,12 +3984,137 @@ then paste in Script Workspace</pre>
         </div>
     </section>
 
+    <!-- Manifesto -->
+    <section class="manifesto">
+        <div class="manifesto-inner">
+            <div class="manifesto-label">
+                <span class="label">/02 — The KiHub mandate</span>
+            </div>
+            <p class="manifesto-text" id="manifesto-text">FileMaker solutions hold years of business logic, but AI tools struggle to find their way around them, and whatever an AI writes still has to be rebuilt by hand in Script Workspace. KiBuild MCP lets your AI find its way around your solution. FM Bridge turns scripts into text you can edit and paste back. KiBiz Systems built both for our own work and shares them free on KiHub. More tools will follow.</p>
+            <div class="manifesto-footer">
+                <span>Creator: KiBiz Systems · Open developer platform</span>
+                <span>KiBuild MCP: MIT · FM Bridge: source-available</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="featured" id="tools">
+        <div class="featured-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/03 — The tools</div>
+                    <h2>Two free tools.<br><span class="italic">Use one or both.</span></h2>
+                </div>
+                <p>KiBuild MCP helps your AI assistant work with your FileMaker solution. FM Bridge lets you edit script
+                    steps as text and paste them back. Each works on its own, and together they cover the whole change.</p>
+            </div>
+
+            <div class="projects-grid reveal">
+                <div class="project-card">
+                    <span class="project-role">Understand</span>
+                    <h3>KiBuild MCP</h3>
+                    <p>Helps your AI assistant find scripts, trace where fields are used, and follow relationships, using
+                        the XML export of your FileMaker solution.</p>
+                    <div class="project-needs">
+                        <span class="project-needs-label">You need</span>
+                        <span>An AI tool that supports MCP: Claude Code, VS Code (Copilot), Cursor, Codex, Gemini CLI,
+                            Windsurf, or Antigravity</span>
+                        <span>An XML export of your file (Tools → Save a Copy as XML)</span>
+                    </div>
+                    <div class="project-meta">
+                        <span>MIT License</span>
+                        <span>macOS · Windows · Linux</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#install">Get started →</a>
+                        <a href="https://github.com/KiBiz-Systems/kibuild-mcp" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <span class="project-role">Edit &amp; paste back</span>
+                    <h3>FM Bridge</h3>
+                    <p>Lets you edit FileMaker script steps as plain text in your code editor, with or without AI, then
+                        paste them back into FileMaker.</p>
+                    <div class="project-needs">
+                        <span class="project-needs-label">You need</span>
+                        <span>VS Code, or an editor built on it: Cursor, Windsurf, or Antigravity</span>
+                        <span>FileMaker Pro on macOS or Windows</span>
+                    </div>
+                    <div class="project-meta">
+                        <span>Source-available · free to use</span>
+                        <span>macOS · Windows</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#install-fm-bridge">Install →</a>
+                        <a href="https://github.com/KiBiz-Systems/FMBridge" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                        <a href="https://github.com/KiBiz-Systems/FMBridge/releases/latest" target="_blank" rel="noopener noreferrer">Latest release ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Worked example -->
+    <section class="featured" id="workflow">
+        <div class="featured-inner">
+            <div class="section-head reveal">
+                <div>
+                    <div class="num-tag">/04 — The workflow</div>
+                    <h2>One change,<br><span class="italic">start to finish.</span></h2>
+                </div>
+                <p>A client asks: “Add a 1.5% late fee to invoices that are more than 30 days overdue.” Here is how that
+                    change goes with both tools. You can also use either tool on its own.</p>
+            </div>
+
+            <div class="install-grid grid-3 reveal">
+                <div class="install-step">
+                    <div class="step-num">/01 — Find what it touches</div>
+                    <h3>Ask before you change anything</h3>
+                    <p>Ask your AI which scripts and layouts use the invoice due date. KiBuild looks it up in your export,
+                        so you know what the change will touch before you open Script Workspace.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">Ask your AI</div>
+                        <pre>Which scripts and layouts use Invoices::DueDate?</pre>
+                    </div>
+                    <div class="note">KiBuild MCP</div>
+                </div>
+                <div class="install-step">
+                    <div class="step-num">/02 — Draft the change</div>
+                    <h3>Edit the script as text</h3>
+                    <p>Copy the steps of the invoice script in FileMaker and paste them into your editor with FM Bridge.
+                        Write the new steps yourself, or ask the AI to draft them, and review the result.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">In your editor · example</div>
+                        <pre><span class="comment"># Late fee after 30 days</span>
+If [ Get ( CurrentDate ) - Invoices::DueDate &gt; 30 ]
+    Set Field [ Invoices::LateFee ; Invoices::Total * 0.015 ]
+End If</pre>
+                    </div>
+                    <div class="note">FM Bridge · AI optional</div>
+                </div>
+                <div class="install-step">
+                    <div class="step-num">/03 — Paste &amp; test</div>
+                    <h3>Put it back in FileMaker</h3>
+                    <p>Press one shortcut to turn the text back into FileMaker steps, paste them into Script Workspace,
+                        and run the script on a test invoice.</p>
+                    <div class="terminal">
+                        <div class="terminal-tab">Shortcut</div>
+                        <pre>Cmd+Option+B <span class="comment">(Ctrl+Alt+B on Windows)</span>
+then paste in Script Workspace</pre>
+                    </div>
+                    <div class="note">FM Bridge</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Quick start -->
     <section class="install" id="install">
         <div class="install-inner">
             <div class="install-head reveal">
                 <div class="left">
-                    <div class="num-tag">/04 — Quick start</div>
+                    <div class="num-tag">/05 — Quick start</div>
                     <h2>Your first answer <span class="italic">in four steps.</span></h2>
                 </div>
                 <div class="right">
@@ -4132,7 +4241,7 @@ then paste in Script Workspace</pre>
         <div class="featured-inner">
             <div class="section-head reveal">
                 <div>
-                    <div class="num-tag">/05 — Results</div>
+                    <div class="num-tag">/06 — Results</div>
                     <h2>Dev time cut<br><span class="italic">almost in half.</span></h2>
                 </div>
                 <p>KiBiz Systems builds and maintains FileMaker solutions for clients, often files someone else wrote.
@@ -4216,7 +4325,7 @@ then paste in Script Workspace</pre>
         <div class="capabilities-inner">
             <div class="section-head reveal">
                 <div>
-                    <div class="num-tag">/06 — Technical reference</div>
+                    <div class="num-tag">/07 — Technical reference</div>
                     <h2>Under<br><span class="italic">the hood.</span></h2>
                 </div>
                 <p>For developers who want the details. Full documentation is in each project's README:
@@ -4384,7 +4493,7 @@ then paste in Script Workspace</pre>
         <div class="capabilities-inner">
             <div class="section-head reveal">
                 <div>
-                    <div class="num-tag">/07 — Community</div>
+                    <div class="num-tag">/08 — Community</div>
                     <h2>Join the<br><span class="italic">conversation.</span></h2>
                 </div>
                 <p>KiHub is built in the open by KiBiz Systems. Share ideas, ask questions, report bugs, and follow what's next — all in GitHub Discussions. No sign-up required beyond a GitHub account.</p>
@@ -4425,7 +4534,7 @@ then paste in Script Workspace</pre>
     <!-- CTA -->
     <section class="cta" id="cta">
         <div class="cta-inner">
-            <span class="label">/08 — Get started</span>
+            <span class="label">/09 — Get started</span>
             <h2>Stop grepping. Stop retyping. <span class="italic">Start building.</span></h2>
             <p>KiHub is KiBiz Systems' open developer platform for FileMaker and AI. KiBuild MCP and FM Bridge are live today, and more projects will follow. Pull requests welcome — open an issue first for significant changes.</p>
             <div class="cta-actions">
