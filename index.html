@@ -2385,6 +2385,879 @@
             }
         }
 
+        /* ===== Demo film: code editor + AI chat with KiBuild, then FileMaker Script Workspace ===== */
+        .kfilm {
+            margin-top: 4rem;
+        }
+
+        .kf-stage {
+            position: relative;
+            height: 640px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.08), transparent 60%), #07070a;
+            border: 1px solid var(--hairline-strong);
+        }
+
+        .kf-win {
+            position: absolute;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        /* code editor window */
+        .kf-code {
+            inset: 18px;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            transition: filter 600ms var(--ease-quiet), transform 600ms var(--ease-quiet);
+        }
+
+        .kf-stage.fm-front .kf-code {
+            filter: brightness(0.4) saturate(0.7);
+            transform: scale(0.985);
+        }
+
+        .kf-titlebar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            flex-shrink: 0;
+            background: #323233;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .kf-titlebar .demo-dots {
+            position: absolute;
+            left: 12px;
+        }
+
+        .kf-wtitle {
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: #cccccc;
+        }
+
+        .kf-body {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 44px 200px minmax(0, 1fr) 360px;
+        }
+
+        .kf-actbar {
+            background: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            padding-top: 14px;
+        }
+
+        .kf-actbar i {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #858585;
+            border-radius: 4px;
+            opacity: 0.7;
+        }
+
+        .kf-actbar i.on {
+            border-color: #e7e7e7;
+            opacity: 1;
+        }
+
+        .kf-pane-title {
+            height: 35px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #bbbbbb;
+            flex-shrink: 0;
+        }
+
+        .kf-explorer {
+            background: #252526;
+            overflow: hidden;
+        }
+
+        .kf-tree {
+            list-style: none;
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: #cccccc;
+        }
+
+        .kf-tree li {
+            padding: 2px 8px 2px calc(10px + var(--d, 0) * 12px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.6;
+        }
+
+        .kf-tree li.dir::before {
+            content: '›';
+            display: inline-block;
+            width: 14px;
+            color: #999;
+        }
+
+        .kf-tree li.dir.open::before {
+            content: '⌄';
+        }
+
+        .kf-tree li.file::before {
+            display: inline-block;
+            width: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .kf-tree li.xml::before { content: '<>'; color: #e37933; }
+        .kf-tree li.md::before { content: 'M↓'; color: #519aba; }
+        .kf-tree li.script::before { content: 'ƒ'; color: #4ec9b0; font-size: 12px; }
+
+        .kf-tree li.sel {
+            background: #37373d;
+        }
+
+        .kf-tree li.new {
+            display: none;
+        }
+
+        .kf-tree li.new.show {
+            display: block;
+            animation: kfFlash 1.6s var(--ease-quiet);
+        }
+
+        @keyframes kfFlash {
+            0% { background: rgba(0, 212, 255, 0.35); }
+            100% { background: transparent; }
+        }
+
+        .kf-editor {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            background: #1e1e1e;
+        }
+
+        .kf-tabs {
+            display: flex;
+            height: 35px;
+            flex-shrink: 0;
+            background: #252526;
+        }
+
+        .kf-tab {
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: #969696;
+            background: #2d2d2d;
+            border-right: 1px solid #252526;
+            white-space: nowrap;
+        }
+
+        .kf-tab.active {
+            color: #ffffff;
+            background: #1e1e1e;
+            box-shadow: inset 0 1px 0 var(--neon-cyan);
+        }
+
+        .kf-tab.new {
+            display: none;
+        }
+
+        .kf-tab.new.show {
+            display: flex;
+        }
+
+        .kf-code-lines {
+            flex: 1;
+            min-height: 0;
+            list-style: none;
+            counter-reset: kfln;
+            overflow-y: auto;
+            padding: 10px 0 60px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.8;
+            color: #d4d4d4;
+            scrollbar-width: thin;
+            scrollbar-color: #424242 transparent;
+        }
+
+        .kf-code-lines li {
+            counter-increment: kfln;
+            position: relative;
+            padding: 0 1rem 0 calc(3.6rem + var(--i, 0) * 2.5ch);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            transition: background 200ms ease;
+        }
+
+        .kf-code-lines li::before {
+            content: counter(kfln);
+            position: absolute;
+            left: 0;
+            width: 2.6rem;
+            text-align: right;
+            color: #6e7681;
+        }
+
+        .kf-code-lines li.cur {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .kf-code-lines li.cur::before {
+            color: #c6c6c6;
+        }
+
+        .kf-code-lines.selected li {
+            background: #264f78;
+        }
+
+        .x-p { color: #808080; }
+        .x-tag { color: #569cd6; }
+        .x-attr { color: #9cdcfe; }
+        .x-val { color: #ce9178; }
+        .t-cmt { color: #6a9955; }
+        .t-ctl { color: #c586c0; }
+        .t-step { color: #569cd6; }
+        .t-str { color: #ce9178; }
+        .t-var { color: #9cdcfe; }
+        .t-fld { color: #4ec9b0; }
+        .t-fn { color: #dcdcaa; }
+        .t-num { color: #b5cea8; }
+
+        .kf-key {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            padding: 0.35rem 0.55rem;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 5px;
+            background: rgba(0, 212, 255, 0.08);
+            white-space: nowrap;
+        }
+
+        .kf-key.light {
+            color: #1d1d1f;
+            border-color: #b8b8be;
+            background: #f2f2f4;
+        }
+
+        .kf-toast {
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.6rem 0.8rem;
+            background: #2d2d30;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: #e6e6e6;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 300ms ease, transform 300ms ease;
+            pointer-events: none;
+        }
+
+        .kf-toast.show {
+            opacity: 1;
+            transform: none;
+        }
+
+        .kf-toast.show .kf-key {
+            animation: kfPress 0.6s ease 0.2s 1;
+        }
+
+        @keyframes kfPress {
+            0%, 100% { transform: scale(1); box-shadow: none; }
+            40% { transform: scale(0.92); box-shadow: 0 0 20px var(--neon-cyan); }
+        }
+
+        /* AI chat panel */
+        .kf-chat {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: #19191c;
+            border-left: 1px solid #2b2b2b;
+        }
+
+        .kf-chat-head {
+            justify-content: space-between;
+            border-bottom: 1px solid #2b2b2b;
+        }
+
+        .kf-mcp {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: 0;
+            text-transform: none;
+            color: #8fd19e;
+        }
+
+        .kf-mcp i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3fb950;
+            box-shadow: 0 0 6px #3fb950;
+        }
+
+        .kf-chat-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #424242 transparent;
+        }
+
+        .kf-msg {
+            animation: kfIn 0.35s var(--ease-quiet);
+        }
+
+        @keyframes kfIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .kf-msg.user {
+            align-self: flex-end;
+            max-width: 88%;
+        }
+
+        .kf-bubble {
+            padding: 0.55rem 0.75rem;
+            background: #263445;
+            border-radius: 10px 10px 2px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #e6edf3;
+        }
+
+        .kf-msg.ai {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #d4d4d4;
+        }
+
+        .kf-msg.ai b {
+            color: #fff;
+        }
+
+        .kf-msg.act {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: #9da5b4;
+        }
+
+        .kf-act-head {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-width: 0;
+        }
+
+        .kf-sp {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+            border: 2px solid #3a3a3a;
+            border-top-color: var(--neon-cyan);
+            border-radius: 50%;
+            animation: kfSpin 0.8s linear infinite;
+        }
+
+        @keyframes kfSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .kf-msg.act.done .kf-sp {
+            border: none;
+            animation: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kf-msg.act.done .kf-sp::before {
+            content: '✓';
+            color: #3fb950;
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        .kf-chip {
+            color: #4ec9b0;
+        }
+
+        .kf-tool {
+            color: #dcdcaa;
+            white-space: nowrap;
+        }
+
+        .kf-args {
+            color: #7d7d7d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .kf-act-detail {
+            display: none;
+            padding: 0.25rem 0 0 1.25rem;
+            color: #8b949e;
+            line-height: 1.5;
+        }
+
+        .kf-msg.act.done .kf-act-detail {
+            display: block;
+        }
+
+        .kf-result {
+            padding: 0.75rem 0.85rem;
+            background: #202027;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+        }
+
+        .kf-r-title {
+            margin-bottom: 0.5rem;
+        }
+
+        .kf-r-group {
+            margin-top: 0.45rem;
+        }
+
+        .kf-r-group span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #8b949e;
+        }
+
+        .kf-r-group ul {
+            list-style: none;
+            margin-top: 0.2rem;
+        }
+
+        .kf-r-group li {
+            font-size: 12.5px;
+            color: #4fc1ff;
+            padding: 1px 0 1px 0.9rem;
+            position: relative;
+        }
+
+        .kf-r-group li::before {
+            content: '•';
+            position: absolute;
+            left: 0.15rem;
+            color: #555;
+        }
+
+        .kf-input {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin: 10px;
+            min-height: 42px;
+            padding: 0.55rem 0.7rem;
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #e6e6e6;
+            flex-shrink: 0;
+        }
+
+        .kf-input.typing {
+            border-color: rgba(0, 212, 255, 0.55);
+        }
+
+        .kf-placeholder {
+            color: #6e6e6e;
+        }
+
+        .kf-input.typing .kf-placeholder {
+            display: none;
+        }
+
+        .kf-caret {
+            width: 2px;
+            height: 1.1em;
+            background: #e6e6e6;
+            animation: kfBlink 1s steps(1) infinite;
+        }
+
+        .kf-input:not(.typing) .kf-caret {
+            display: none;
+        }
+
+        @keyframes kfBlink {
+            50% { opacity: 0; }
+        }
+
+        .kf-send {
+            margin-left: auto;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #3a3a3a;
+            color: #bbb;
+            font-size: 13px;
+        }
+
+        .kf-input.typing .kf-send {
+            background: var(--neon-cyan);
+            color: var(--void-black);
+        }
+
+        .kf-status {
+            height: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            background: #0e5a8a;
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 11.5px;
+            color: #e6f4ff;
+        }
+
+        /* FileMaker Script Workspace window (light) */
+        .kf-fm {
+            inset: 40px 70px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border: 1px solid #cfcfd4;
+            opacity: 0;
+            transform: translateY(24px) scale(0.97);
+            transition: opacity 600ms var(--ease-quiet), transform 600ms var(--ease-quiet);
+            pointer-events: none;
+        }
+
+        .kf-fm.show {
+            opacity: 1;
+            transform: none;
+        }
+
+        .kf-fm-body {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 210px minmax(0, 1fr);
+        }
+
+        .kf-fm-list {
+            padding: 0.7rem 0.6rem;
+            background: #f5f5f7;
+            border-right: 1px solid #dedee3;
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .kf-fm-search {
+            margin-bottom: 0.6rem;
+            padding: 0.25rem 0.55rem;
+            background: #fff;
+            border: 1px solid #d0d0d5;
+            border-radius: 6px;
+            color: #9a9aa0;
+        }
+
+        .kf-fm-folder {
+            margin-top: 0.35rem;
+            padding: 0.2rem 0.4rem;
+            font-weight: 600;
+        }
+
+        .kf-fm-item {
+            padding: 0.2rem 0.5rem 0.2rem 1.3rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kf-fm-item.sel {
+            background: #2f6fde;
+            color: #fff;
+        }
+
+        .kf-fm-steps {
+            overflow-y: auto;
+            min-height: 0;
+            scrollbar-width: thin;
+        }
+
+        .kf-fm-steps li {
+            min-height: 0;
+            padding-left: calc(4rem + var(--i, 0) * 1.75rem);
+            animation: kfIn 0.25s var(--ease-quiet);
+        }
+
+        .kf-paste {
+            position: absolute;
+            top: 50%;
+            left: calc(50% + 105px);
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.75rem 1rem;
+            background: #fff;
+            border: 1px solid #d6d6db;
+            border-radius: 10px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+            font-size: 13px;
+            color: #1d1d1f;
+            opacity: 0;
+            transform: translate(-50%, -40%);
+            transition: opacity 250ms ease, transform 250ms ease;
+        }
+
+        .kf-paste.show {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .kf-paste.show .kf-key {
+            animation: kfPress 0.6s ease 0.6s 1;
+        }
+
+        .kf-done {
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            padding: 0.5rem 0.8rem;
+            background: #1f883d;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 300ms ease, transform 300ms ease;
+        }
+
+        .kf-done.show {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* controls */
+        .kf-controls {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+        }
+
+        .kf-chapters {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.6rem;
+        }
+
+        .kf-ch {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.7rem 0.2rem 0;
+            border-top: 2px solid var(--hairline-strong);
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--ink-mute);
+            transition: color 300ms ease, border-color 300ms ease;
+        }
+
+        .kf-ch-num {
+            color: var(--ink-faint);
+        }
+
+        .kf-ch:hover,
+        .kf-ch.done {
+            color: var(--ink-soft);
+        }
+
+        .kf-ch.done {
+            border-top-color: rgba(0, 212, 255, 0.45);
+        }
+
+        .kf-ch.active {
+            color: #fff;
+            border-top-color: var(--neon-cyan);
+            box-shadow: 0 -6px 12px -8px var(--neon-cyan);
+        }
+
+        .kf-ch.active .kf-ch-num,
+        .kf-ch.done .kf-ch-num {
+            color: var(--neon-cyan);
+        }
+
+        .kf-now {
+            display: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: #fff;
+        }
+
+        .kf-buttons {
+            display: flex;
+            gap: 0.5rem;
+            padding-top: 0.7rem;
+        }
+
+        .kf-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--neon-cyan);
+            padding: 0.45rem 0.8rem;
+            border: 1px solid var(--hairline-strong);
+            white-space: nowrap;
+        }
+
+        .kf-btn:hover {
+            border-color: var(--neon-cyan);
+        }
+
+        .kf-caption {
+            margin-top: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--ink-mute);
+        }
+
+        @media (max-width: 1200px) {
+            .kf-body {
+                grid-template-columns: 44px 170px minmax(0, 1fr) 320px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .kf-stage {
+                height: 720px;
+            }
+
+            .kf-code {
+                inset: 8px;
+            }
+
+            .kf-body {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: 230px minmax(0, 1fr);
+            }
+
+            .kf-actbar,
+            .kf-explorer {
+                display: none;
+            }
+
+            .kf-chat {
+                border-left: none;
+                border-top: 1px solid #2b2b2b;
+            }
+
+            .kf-wtitle {
+                font-size: 11.5px;
+            }
+
+            .kf-fm {
+                inset: 24px 10px;
+            }
+
+            .kf-fm-body {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .kf-fm-list {
+                display: none;
+            }
+
+            .kf-paste {
+                left: 50%;
+            }
+
+            .kf-controls {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .kf-chapters {
+                width: 100%;
+            }
+
+            .kf-ch-label {
+                display: none;
+            }
+
+            .kf-ch {
+                min-width: 0;
+            }
+
+            .kf-now {
+                display: block;
+            }
+
+            .kf-done {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                text-align: center;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 1023px) {
             nav.top ul {
@@ -3002,54 +3875,83 @@ then paste in Script Workspace</pre>
                 </div>
             </div>
 
-            <figure class="bridge-demo reveal" id="bridge-demo" aria-label="Illustration: a script edited as text in a code editor, copied with FM Bridge, and pasted into FileMaker's Script Workspace">
-                <div class="demo-pane demo-editor">
-                    <div class="demo-bar">
-                        <span class="demo-dots"><i></i><i></i><i></i></span>
-                        <span class="demo-tab">Invoice - Late Fee</span>
-                        <span class="demo-app">Code editor</span>
+            <div class="kfilm reveal" id="kfilm">
+                <div class="kf-stage" id="kf-stage" role="img" aria-label="Illustration: in a code editor, a developer asks an AI assistant to process a FileMaker export with KiBuild, asks where a field is used, has the AI write a late-fee script, reviews it, copies it with FM Bridge, and pastes it into FileMaker's Script Workspace."></div>
+                <div class="kf-controls">
+                    <div class="kf-chapters">
+                        <button type="button" class="kf-ch" data-ch="0"><span class="kf-ch-num">01</span><span class="kf-ch-label">Process the export</span></button>
+                        <button type="button" class="kf-ch" data-ch="1"><span class="kf-ch-num">02</span><span class="kf-ch-label">Ask where it's used</span></button>
+                        <button type="button" class="kf-ch" data-ch="2"><span class="kf-ch-num">03</span><span class="kf-ch-label">Create a script</span></button>
+                        <button type="button" class="kf-ch" data-ch="3"><span class="kf-ch-num">04</span><span class="kf-ch-label">Review &amp; copy</span></button>
+                        <button type="button" class="kf-ch" data-ch="4"><span class="kf-ch-num">05</span><span class="kf-ch-label">Paste into FileMaker</span></button>
                     </div>
-                    <ol class="demo-code">
-                        <li><span class="c-cmt"># Late fee after 30 days</span></li>
-                        <li><span class="c-ctl">Set Error Capture</span> [ On ]</li>
-                        <li><span class="c-step">Set Variable</span> [ <span class="c-var">$daysLate</span> ; Value: <span class="c-fn">Get</span> ( CurrentDate ) - <span class="c-fld">Invoices::DueDate</span> ]</li>
-                        <li class="blank">&nbsp;</li>
-                        <li><span class="c-ctl">If</span> [ <span class="c-var">$daysLate</span> &gt; <span class="c-num">30</span> ]</li>
-                        <li class="ind"><span class="c-step">Set Field</span> [ <span class="c-fld">Invoices::LateFee</span> ; <span class="c-fld">Invoices::Total</span> * <span class="c-num">0.015</span> ]</li>
-                        <li class="ind"><span class="c-step">Commit Records/Requests</span> [ With dialog: Off ]</li>
-                        <li><span class="c-ctl">End If</span></li>
-                    </ol>
-                </div>
-
-                <div class="demo-bridge">
-                    <span class="demo-key">Cmd+Option+B</span>
-                    <span class="demo-arrow" aria-hidden="true">→</span>
-                    <span class="demo-toast">Copied for FileMaker</span>
-                    <span class="demo-then">then paste with <b>Cmd+V</b></span>
-                </div>
-
-                <div class="demo-pane demo-fm">
-                    <div class="fm-titlebar">
-                        <span class="demo-dots"><i></i><i></i><i></i></span>
-                        <span class="fm-title">Invoice - Late Fee</span>
+                    <div class="kf-now" aria-live="polite"></div>
+                    <div class="kf-buttons">
+                        <button type="button" class="kf-btn" id="kf-play">Pause ❚❚</button>
+                        <button type="button" class="kf-btn" id="kf-replay">Replay ↺</button>
                     </div>
-                    <ol class="fm-steps">
-                        <li class="fm-cmt"># Late fee after 30 days</li>
-                        <li><span class="fm-ctl">Set Error Capture</span> <span class="fm-ctl">[</span> On <span class="fm-ctl">]</span></li>
-                        <li>Set Variable [ $daysLate ; Value: Get ( CurrentDate ) - Invoices::DueDate ]</li>
-                        <li class="blank">&nbsp;</li>
-                        <li><span class="fm-ctl">If</span> <span class="fm-ctl">[</span> $daysLate &gt; 30 <span class="fm-ctl">]</span></li>
-                        <li class="ind">Set Field [ Invoices::LateFee ; Invoices::Total * .015 ]</li>
-                        <li class="ind">Commit Records/Requests [ With dialog: Off ]</li>
-                        <li><span class="fm-ctl">End If</span></li>
-                    </ol>
                 </div>
+                <p class="kf-caption">Illustration · the solution, scripts, and fields shown are made-up examples</p>
 
-                <figcaption>
-                    <span>Illustration · edit as text, copy with one shortcut, paste into Script Workspace</span>
-                    <button type="button" class="demo-replay" id="demo-replay">Replay ↺</button>
-                </figcaption>
-            </figure>
+                <template id="kf-template">
+                    <div class="kf-win kf-code">
+                        <div class="kf-titlebar"><span class="demo-dots"><i></i><i></i><i></i></span><span class="kf-wtitle">MySolution — VS Code</span></div>
+                        <div class="kf-body">
+                            <div class="kf-actbar"><i class="on"></i><i></i><i></i><i></i></div>
+                            <div class="kf-explorer">
+                                <div class="kf-pane-title">Explorer</div>
+                                <ul class="kf-tree">
+                                    <li class="dir open" style="--d:0">MYSOLUTION</li>
+                                    <li class="dir open" style="--d:1">files</li>
+                                    <li class="dir open" style="--d:2">Source</li>
+                                    <li class="file xml sel" style="--d:3">MySolution.xml</li>
+                                    <li class="dir open new" data-add="schema" style="--d:2">Schema</li>
+                                    <li class="dir open new" data-add="schema" style="--d:3">MySolution</li>
+                                    <li class="dir new" data-add="schema" style="--d:4">scripts</li>
+                                    <li class="dir new" data-add="schema" style="--d:4">layouts</li>
+                                    <li class="dir new" data-add="schema" style="--d:4">tables</li>
+                                    <li class="dir new" data-add="schema" style="--d:4">relationships</li>
+                                    <li class="file md new" data-add="map" style="--d:1">workspace_map.md</li>
+                                    <li class="file script new" data-add="script" style="--d:1">Invoice - Late Fee</li>
+                                </ul>
+                            </div>
+                            <div class="kf-editor">
+                                <div class="kf-tabs">
+                                    <span class="kf-tab active" data-tab="xml">MySolution.xml</span>
+                                    <span class="kf-tab new" data-tab="script">Invoice - Late Fee</span>
+                                </div>
+                                <ol class="kf-code-lines"></ol>
+                                <div class="kf-toast"><span class="kf-key">Cmd+Option+B</span><span>Copied for FileMaker · 21 steps</span></div>
+                            </div>
+                            <div class="kf-chat">
+                                <div class="kf-pane-title kf-chat-head"><span>AI assistant</span><span class="kf-mcp"><i></i>kibuild · 32 tools</span></div>
+                                <div class="kf-chat-body"></div>
+                                <div class="kf-input"><span class="kf-typed"></span><span class="kf-caret"></span><span class="kf-placeholder">Ask about your FileMaker solution…</span><span class="kf-send">↑</span></div>
+                            </div>
+                        </div>
+                        <div class="kf-status"><span>● kibuild connected</span><span>FM Bridge</span></div>
+                    </div>
+
+                    <div class="kf-win kf-fm">
+                        <div class="fm-titlebar"><span class="demo-dots"><i></i><i></i><i></i></span><span class="fm-title">Invoice - Late Fee</span></div>
+                        <div class="kf-fm-body">
+                            <div class="kf-fm-list">
+                                <div class="kf-fm-search">Search</div>
+                                <div class="kf-fm-folder">▾ Invoices</div>
+                                <div class="kf-fm-item">Invoice - Post</div>
+                                <div class="kf-fm-item">Invoice - Send Reminder</div>
+                                <div class="kf-fm-item">Invoice - Aging Report</div>
+                                <div class="kf-fm-item sel">Invoice - Late Fee</div>
+                                <div class="kf-fm-folder">▸ Statements</div>
+                                <div class="kf-fm-folder">▸ Utilities</div>
+                            </div>
+                            <ol class="fm-steps kf-fm-steps"></ol>
+                        </div>
+                        <div class="kf-paste"><span class="kf-key light">Cmd+V</span><span>Paste into Script Workspace</span></div>
+                        <div class="kf-done">✓ 21 steps pasted · run it on a test invoice</div>
+                    </div>
+                </template>
+            </div>
         </div>
     </section>
 
@@ -4079,6 +4981,315 @@ then paste in Script Workspace</pre>
         });
     </script>
 
+<script>
+// KiBuild + FM Bridge illustration: process export -> ask -> create script -> review -> paste into FileMaker
+(() => {
+    const root = document.getElementById('kfilm');
+    if (!root) return;
+    const stage = document.getElementById('kf-stage');
+    const tpl = document.getElementById('kf-template');
+    const chBtns = [...root.querySelectorAll('.kf-ch')];
+    const playBtn = document.getElementById('kf-play');
+    const replayBtn = document.getElementById('kf-replay');
+    const nowLabel = root.querySelector('.kf-now');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const STOP = Symbol('stop');
+
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // ---------- content ----------
+    const XML = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<FMSaveAsXML version="2.2" File="MySolution.fmp12">',
+        '  <Structure membercount="1">',
+        '    <AddAction>',
+        '      <BaseTableCatalog membercount="31">',
+        '        <BaseTable id="129" name="Invoices">',
+        '          <FieldCatalog membercount="46">',
+        '            <Field id="1" name="InvoiceID" dataType="Text">',
+        '            <Field id="7" name="DueDate" dataType="Date">',
+        '            <Field id="9" name="Total" dataType="Number">',
+        '            <Field id="12" name="LateFee" dataType="Number">',
+        '      <ScriptCatalog membercount="214">',
+        '        <Script id="1" name="Invoice - Post">',
+        '        <Script id="2" name="Invoice - Send Reminder">',
+        '      <LayoutCatalog membercount="63">',
+        '        <Layout id="5" name="Invoice Detail">'
+    ];
+
+    // s = step, p = parameters (undefined = no brackets), k = control step, i = indent, c = comment
+    const SCRIPT = [
+        { c: '# Invoice - Late Fee' },
+        { c: '# Adds a 1.5% late fee to invoices more than 30 days overdue' },
+        { s: 'Set Error Capture', p: 'On', k: 1 },
+        { s: 'Allow User Abort', p: 'Off', k: 1 },
+        { s: 'Go to Layout', p: '"Invoices List"' },
+        { s: 'Enter Find Mode', p: 'Pause: Off' },
+        { s: 'Set Field', p: 'Invoices::Status ; "Open"' },
+        { s: 'Perform Find', p: '' },
+        { s: 'If', p: 'Get ( FoundCount ) = 0', k: 1 },
+        { s: 'Exit Script', p: 'Text Result: "No open invoices"', k: 1, i: 1 },
+        { s: 'End If', k: 1 },
+        { s: 'Go to Record/Request/Page', p: 'First' },
+        { s: 'Loop', k: 1 },
+        { s: 'If', p: 'Get ( CurrentDate ) - Invoices::DueDate > 30 and IsEmpty ( Invoices::LateFee )', k: 1, i: 1 },
+        { s: 'Set Field', p: 'Invoices::LateFee ; Round ( Invoices::Total * .015 ; 2 )', i: 2 },
+        { s: 'Commit Records/Requests', p: 'With dialog: Off', i: 2 },
+        { s: 'End If', k: 1, i: 1 },
+        { s: 'Go to Record/Request/Page', p: 'Next ; Exit after last: On', i: 1 },
+        { s: 'End Loop', k: 1 },
+        { s: 'Go to Layout', p: 'original layout' },
+        { s: 'Exit Script', p: 'Text Result: "Done"', k: 1 }
+    ];
+
+    function hlXml(line) {
+        let s = esc(line);
+        s = s.replace(/(\s)([\w:]+)=("[^"]*")/g, '$1<span class="x-attr">$2</span>=<span class="x-val">$3</span>');
+        s = s.replace(/&lt;(\/?\??)([\w:]+)/g, '<span class="x-p">&lt;$1</span><span class="x-tag">$2</span>');
+        s = s.replace(/(\??\/?&gt;)/g, '<span class="x-p">$1</span>');
+        return s;
+    }
+
+    function hlParams(p) {
+        const re = /("[^"]*")|(\$\w+)|(\b[A-Za-z_]+::\w+)|(\b(?:Get|Round|IsEmpty)\b)|(\.?\b\d+(?:\.\d+)?\b)/g;
+        let out = '', last = 0, m;
+        while ((m = re.exec(p))) {
+            out += esc(p.slice(last, m.index));
+            const cls = m[1] ? 't-str' : m[2] ? 't-var' : m[3] ? 't-fld' : m[4] ? 't-fn' : 't-num';
+            out += `<span class="${cls}">${esc(m[0])}</span>`;
+            last = re.lastIndex;
+        }
+        return out + esc(p.slice(last));
+    }
+
+    const editorLine = l => {
+        if (l.c) return `<span class="t-cmt">${esc(l.c)}</span>`;
+        const step = `<span class="${l.k ? 't-ctl' : 't-step'}">${esc(l.s)}</span>`;
+        if (l.p === undefined) return step;
+        return l.p === '' ? `${step} [ ]` : `${step} [ ${hlParams(l.p)} ]`;
+    };
+
+    const fmLine = l => {
+        if (l.c) return esc(l.c);
+        const name = l.k ? `<span class="fm-ctl">${esc(l.s)}</span>` : esc(l.s);
+        if (l.p === undefined) return name;
+        const [o, c] = l.k ? ['<span class="fm-ctl">[</span>', '<span class="fm-ctl">]</span>'] : ['[', ']'];
+        return l.p === '' ? `${name} ${o} ${c}` : `${name} ${o} ${esc(l.p)} ${c}`;
+    };
+
+    // ---------- scene refs ----------
+    let $ = {};
+    function reset() {
+        stage.innerHTML = tpl.innerHTML;
+        const q = sel => stage.querySelector(sel);
+        $ = {
+            code: q('.kf-code-lines'), chat: q('.kf-chat-body'), typed: q('.kf-typed'), input: q('.kf-input'),
+            tabXml: q('[data-tab="xml"]'), tabScript: q('[data-tab="script"]'), toast: q('.kf-toast'),
+            fm: q('.kf-fm'), fmSteps: q('.kf-fm-steps'), paste: q('.kf-paste'), done: q('.kf-done')
+        };
+        stage.classList.remove('fm-front');
+    }
+
+    const makeWait = (id, fast) => ms => new Promise((res, rej) => {
+        if (id !== runId) return rej(STOP);
+        if (fast) return res();
+        let t = 0;
+        const h = setInterval(() => {
+            if (id !== runId) { clearInterval(h); rej(STOP); return; }
+            if (!paused) { t += 40; if (t >= ms) { clearInterval(h); res(); } }
+        }, 40);
+    });
+
+    const scrollChat = () => { $.chat.scrollTop = $.chat.scrollHeight; };
+
+    function addMsg(cls, html) {
+        const d = document.createElement('div');
+        d.className = `kf-msg ${cls}`;
+        d.innerHTML = html;
+        $.chat.appendChild(d);
+        scrollChat();
+        return d;
+    }
+
+    async function ask(text, ctx) {
+        if (!ctx.fast) {
+            $.input.classList.add('typing');
+            for (const ch of text) { $.typed.textContent += ch; await ctx.w(24); }
+            await ctx.w(350);
+            $.typed.textContent = '';
+            $.input.classList.remove('typing');
+        }
+        addMsg('user', `<div class="kf-bubble">${esc(text)}</div>`);
+        await ctx.w(450);
+        const t = addMsg('act thinking', '<div class="kf-act-head"><i class="kf-sp"></i><span>Thinking…</span></div>');
+        await ctx.w(800);
+        t.remove();
+    }
+
+    async function tool(name, args, detail, ms, ctx) {
+        const a = addMsg('act', `<div class="kf-act-head"><i class="kf-sp"></i><span class="kf-chip">kibuild</span><span class="kf-tool">${name}</span><span class="kf-args">${esc(args)}</span></div><div class="kf-act-detail">└ ${detail}</div>`);
+        await ctx.w(ms);
+        a.classList.add('done');
+        scrollChat();
+        await ctx.w(250);
+    }
+
+    const reveal = key => stage.querySelectorAll(`[data-add="${key}"]`).forEach(li => li.classList.add('show'));
+
+    // ---------- chapters ----------
+    const chapters = [
+        async ctx => {
+            $.code.innerHTML = XML.map(l => `<li>${hlXml(l)}</li>`).join('');
+            await ctx.w(900);
+            await ask('Explode my FileMaker export', ctx);
+            await tool('explode_xml_export', 'files/Source/MySolution.xml', '214 scripts · 63 layouts · 31 tables · 58 relationships → files/Schema/MySolution/', 1900, ctx);
+            reveal('schema');
+            await tool('generate_schema_map', 'MySolution', 'workspace_map.md · an index of every table, layout, and script', 1200, ctx);
+            reveal('map');
+            await ctx.w(300);
+            addMsg('ai', 'Your export is processed. Ask me anything about <b>MySolution</b>.');
+            await ctx.w(1600);
+        },
+        async ctx => {
+            await ask('Where is Invoices::DueDate used?', ctx);
+            await tool('search_index', '"DueDate"', '6 matches in workspace_map.md', 900, ctx);
+            await tool('find_field_references_in_scripts', '["Invoices::DueDate"]', '4 scripts', 1100, ctx);
+            await tool('find_field_references_in_layouts', '["Invoices::DueDate"]', '2 layouts', 900, ctx);
+            await tool('find_field_references_in_calculations', '["Invoices::DueDate"]', '1 field calculation', 900, ctx);
+            addMsg('ai', `<div class="kf-result">
+                <div class="kf-r-title"><b>Invoices::DueDate</b> is used in 7 places</div>
+                <div class="kf-r-group"><span>Scripts</span><ul><li>Invoice - Post</li><li>Invoice - Send Reminder</li><li>Invoice - Aging Report</li><li>Statement - Print</li></ul></div>
+                <div class="kf-r-group"><span>Layouts</span><ul><li>Invoice Detail</li><li>Invoices List</li></ul></div>
+                <div class="kf-r-group"><span>Calculations</span><ul><li>Invoices::DaysOverdue</li></ul></div>
+            </div>`);
+            await ctx.w(2800);
+        },
+        async ctx => {
+            await ask('Create a script that adds a 1.5% late fee to invoices more than 30 days overdue.', ctx);
+            await tool('find_table', '"Invoices"', 'Total · DueDate · LateFee · Status · 42 more fields', 1000, ctx);
+            await tool('load_skill', '"pro_scriptwriter"', 'FileMaker scripting guidance loaded', 800, ctx);
+            reveal('script');
+            $.tabXml.classList.remove('active');
+            $.tabScript.classList.add('show', 'active');
+            $.code.innerHTML = '';
+            for (const l of SCRIPT) {
+                const li = document.createElement('li');
+                li.innerHTML = editorLine(l) || '&nbsp;';
+                if (l.i) li.style.setProperty('--i', l.i);
+                $.code.appendChild(li);
+                $.code.scrollTop = $.code.scrollHeight;
+                await ctx.w(120);
+            }
+            addMsg('ai', 'I wrote <b>Invoice - Late Fee</b>. It finds open invoices, skips any that already have a late fee, and rounds the fee to cents. Review it before you paste it.');
+            await ctx.w(1800);
+        },
+        async ctx => {
+            const lines = [...$.code.children];
+            $.code.scrollTop = 0;
+            await ctx.w(500);
+            for (const li of lines) {
+                lines.forEach(x => x.classList.remove('cur'));
+                li.classList.add('cur');
+                const top = Math.max(0, li.offsetTop - $.code.clientHeight * 0.45);
+                if (ctx.fast) $.code.scrollTop = top; else $.code.scrollTo({ top, behavior: 'smooth' });
+                await ctx.w(230);
+            }
+            lines.forEach(x => x.classList.remove('cur'));
+            await ctx.w(400);
+            $.code.classList.add('selected');
+            await ctx.w(700);
+            $.toast.classList.add('show');
+            await ctx.w(2000);
+        },
+        async ctx => {
+            stage.classList.add('fm-front');
+            $.fm.classList.add('show');
+            await ctx.w(1000);
+            $.paste.classList.add('show');
+            await ctx.w(1200);
+            $.paste.classList.remove('show');
+            for (const l of SCRIPT) {
+                const li = document.createElement('li');
+                li.innerHTML = fmLine(l);
+                if (l.c) li.className = 'fm-cmt';
+                if (l.i) li.style.setProperty('--i', l.i);
+                $.fmSteps.appendChild(li);
+                $.fmSteps.scrollTop = $.fmSteps.scrollHeight;
+                await ctx.w(70);
+            }
+            await ctx.w(500);
+            $.done.classList.add('show');
+            await ctx.w(600);
+        }
+    ];
+
+    // ---------- runner ----------
+    let runId = 0, paused = false, userPaused = false, autoPaused = false, started = false;
+
+    function setChapter(i) {
+        chBtns.forEach((b, j) => {
+            b.classList.toggle('done', j < i);
+            b.classList.toggle('active', j === i);
+        });
+        const label = chBtns[i] && chBtns[i].querySelector('.kf-ch-label');
+        nowLabel.textContent = label ? `${String(i + 1).padStart(2, '0')} · ${label.textContent}` : '';
+    }
+
+    function setPaused(p) {
+        paused = p;
+        playBtn.textContent = p ? 'Play ▶' : 'Pause ❚❚';
+    }
+
+    async function run(animateFrom, upTo = chapters.length - 1) {
+        const id = ++runId;
+        started = true;
+        reset();
+        setPaused(false);
+        root.classList.remove('ended');
+        try {
+            for (let i = 0; i <= upTo; i++) {
+                const fast = i < animateFrom;
+                setChapter(i);
+                await chapters[i]({ fast, w: makeWait(id, fast) });
+                if (id !== runId) return;
+            }
+            if (upTo === chapters.length - 1) {
+                chBtns.forEach(b => { b.classList.add('done'); b.classList.remove('active'); });
+                root.classList.add('ended');
+                nowLabel.textContent = 'Done · replay any step';
+                playBtn.textContent = 'Play ▶';
+            }
+        } catch (e) {
+            if (e !== STOP) throw e;
+        }
+    }
+
+    chBtns.forEach((b, i) => b.addEventListener('click', () => {
+        userPaused = false;
+        if (reduced) run(i + 1, i); else run(i);
+    }));
+    replayBtn.addEventListener('click', () => { userPaused = false; reduced ? run(99) : run(0); });
+    playBtn.addEventListener('click', () => {
+        if (root.classList.contains('ended')) { run(0); return; }
+        userPaused = !paused;
+        setPaused(!paused);
+    });
+
+    if (reduced) {
+        playBtn.hidden = true;
+        run(99);
+        return;
+    }
+
+    reset();
+    new IntersectionObserver(entries => {
+        const visible = entries[0].isIntersecting;
+        if (visible && !started) run(0);
+        else if (!visible && started && !paused) { autoPaused = true; setPaused(true); }
+        else if (visible && autoPaused && !userPaused) { autoPaused = false; setPaused(false); }
+    }, { threshold: 0.35 }).observe(stage);
+})();
+</script>
 </body>
 
 </html>
